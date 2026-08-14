@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --cd-teal: #0f766e;
+  --cd-primary: #1d4ed8;
 }
 
 * {

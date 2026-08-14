@@ -195,7 +195,7 @@ export default function Complete() {
             <Metric label="Peso después" value={s.afterWeight != null ? `${s.afterWeight} g` : '—'} />
             <div className="flex justify-between py-3">
               <span className="text-sm text-slate-500">Diferencia de masa</span>
-              <span className="text-sm font-bold text-teal-700">{diff} g</span>
+              <span className="text-sm font-bold text-blue-700">{diff} g</span>
             </div>
             <Metric
               label="Verificación de identidad"
@@ -234,7 +234,7 @@ export default function Complete() {
         <div className="mt-6 space-y-3">
           {s.patientDocNumber && (
             <button
-              className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
+              className="min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
               onClick={() => {
                 // Mantiene al paciente ya identificado/verificado (y al
                 // profesional) — para el siguiente medicamento pendiente de

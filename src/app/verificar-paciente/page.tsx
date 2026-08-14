@@ -119,7 +119,7 @@ export default function VerificarPaciente() {
 
         {!done && (
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 text-2xl text-teal-700">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-2xl text-blue-700">
               ◉
             </div>
             <h2 className="mt-4 text-center text-lg font-bold text-slate-900">Prueba de vida + comparación facial</h2>
@@ -138,7 +138,7 @@ export default function VerificarPaciente() {
             {error && <p className="mt-3 rounded-xl bg-red-50 p-2 text-sm text-red-700">{error}</p>}
 
             <button
-              className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-70 active:scale-[0.98]"
+              className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm disabled:opacity-70 active:scale-[0.98]"
               onClick={() => setStarted(true)}
               disabled={busy}
             >
@@ -160,7 +160,7 @@ export default function VerificarPaciente() {
               </div>
             </div>
             <button
-              className="mt-6 min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
+              className="mt-6 min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
               onClick={continuar}
             >
               Ver medicamentos pendientes

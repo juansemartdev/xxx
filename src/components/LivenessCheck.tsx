@@ -140,7 +140,7 @@ export default function LivenessCheck({onComplete, onCancel}: Props) {
   if (loading) {
     return (
       <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
-        <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-teal-700" />
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-700" />
         Preparando verificación biométrica…
       </div>
     );

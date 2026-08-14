@@ -106,7 +106,7 @@ export default function CameraCapture({
       )}
       {active && (
         <button
-          className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
+          className="min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
           onClick={capture}
         >
           Tomar fotografía

@@ -56,13 +56,13 @@ export default function NFC() {
           </div>
         ) : (
           <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-teal-50 text-6xl text-teal-700">
+            <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-blue-50 text-6xl text-blue-700">
               ◉
             </div>
             <p className="mt-6 text-lg font-bold text-slate-900">Listo para escanear</p>
             <p className="mt-2 text-sm text-slate-500">{msg}</p>
             <button
-              className="mt-7 min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
+              className="mt-7 min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
               onClick={scan}
             >
               Escanear NFC

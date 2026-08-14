@@ -125,7 +125,7 @@ export default function Login() {
           <label className="block">
             <span className="mb-2 block text-sm font-semibold text-slate-700">Usuario</span>
             <input
-              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 text-base outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 text-base outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="tu.usuario"
@@ -139,7 +139,7 @@ export default function Login() {
 
         <div className="mt-6 space-y-3">
           <button
-            className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
+            className="min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
             onClick={startAuthenticate}
             disabled={busy}
           >

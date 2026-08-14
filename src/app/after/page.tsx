@@ -110,7 +110,7 @@ export default function After() {
 
         {vial.processing && (
           <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-teal-700" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-700" />
             Leyendo datos del vial y báscula…
           </div>
         )}
@@ -155,25 +155,25 @@ export default function After() {
               value={vial.product}
               onChange={(e) => vial.setProduct(e.target.value)}
               placeholder="Producto"
-              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
             />
             <input
               value={vial.gtin}
               onChange={(e) => vial.setGtin(e.target.value)}
               placeholder="GTIN"
-              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
             />
             <input
               value={vial.lot}
               onChange={(e) => vial.setLot(e.target.value)}
               placeholder="Lote"
-              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
             />
             <input
               value={vial.expiry}
               onChange={(e) => vial.setExpiry(e.target.value)}
               placeholder="Vencimiento (AAAA-MM-DD)"
-              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
             />
           </div>
         </div>
@@ -206,7 +206,7 @@ export default function After() {
 
         <button
           disabled={!photo || !vial.weight}
-          className="mt-4 min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
+          className="mt-4 min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
           onClick={confirm}
         >
           Cerrar sesión

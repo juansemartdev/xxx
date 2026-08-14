@@ -74,8 +74,26 @@ export default function Header({stepIndex, stepSuffix, stepLabel, totalSteps = 6
             )}
           </div>
           {professional && (
-            <button onClick={cerrarSesion} className="rounded-lg px-2 py-2 text-sm font-medium text-slate-500">
-              Cerrar sesión
+            <button
+              onClick={cerrarSesion}
+              aria-label="Cerrar sesión"
+              title="Cerrar sesión"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-500 active:bg-slate-100"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
             </button>
           )}
         </div>
@@ -83,14 +101,14 @@ export default function Header({stepIndex, stepSuffix, stepLabel, totalSteps = 6
         {stepIndex && stepLabel && (
           <div className="mx-auto max-w-xl px-4 pb-3">
             <div className="mb-2 flex justify-between text-xs font-semibold">
-              <span className="text-teal-700">{stepText}</span>
+              <span className="text-blue-700">{stepText}</span>
               <span className="text-slate-500">{stepLabel}</span>
             </div>
             <div className="flex gap-1.5">
               {Array.from({length: totalSteps}, (_, i) => (
                 <span
                   key={i}
-                  className={`h-1.5 flex-1 rounded-full ${i < stepIndex ? 'bg-teal-700' : 'bg-slate-200'}`}
+                  className={`h-1.5 flex-1 rounded-full ${i < stepIndex ? 'bg-blue-700' : 'bg-slate-200'}`}
                 />
               ))}
             </div>

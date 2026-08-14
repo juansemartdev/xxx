@@ -32,7 +32,7 @@ function Field({
       placeholder={placeholder}
       inputMode={inputMode}
       maxLength={maxLength}
-      className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+      className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
     />
   );
 }
@@ -247,7 +247,7 @@ export default function Registro() {
           <div className="space-y-4">
             {processing && (
               <div className="flex items-center gap-2 text-sm text-slate-500">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-teal-700" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-700" />
                 Leyendo datos de la cédula…
               </div>
             )}
@@ -277,7 +277,7 @@ export default function Registro() {
 
             <button
               disabled={!firstName || !lastName}
-              className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
+              className="min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
               onClick={() => setStep('foto-viva')}
             >
               Continuar
@@ -288,7 +288,7 @@ export default function Registro() {
         {step === 'foto-viva' && !livenessStarted && (
           <div className="space-y-4">
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 text-2xl text-teal-700">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-2xl text-blue-700">
                 ◉
               </div>
               <h2 className="mt-4 text-center text-lg font-bold text-slate-900">Foto de referencia (en vivo)</h2>
@@ -305,7 +305,7 @@ export default function Registro() {
 
               <div className="mt-6 space-y-3">
                 <button
-                  className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
+                  className="min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
                   onClick={() => setLivenessStarted(true)}
                   disabled={saving}
                 >
@@ -317,7 +317,7 @@ export default function Registro() {
                   disabled={saving}
                 >
                   {saving && (
-                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-teal-700" />
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-blue-700" />
                   )}
                   {saving ? 'Guardando…' : 'Omitir (usar solo foto de la cédula)'}
                 </button>
