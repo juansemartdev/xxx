@@ -99,6 +99,13 @@ export async function ensurePatientsSchema() {
     )
   `;
   await sql`CREATE INDEX IF NOT EXISTS idx_patients_document ON patients (document_number)`;
+  // La foto de la cédula puede ser vieja (la persona cambia con los años).
+  // reference_photo es una foto EN VIVO capturada con Face Liveness durante
+  // el registro (ver /registro), usada como referencia más confiable para
+  // el Face Match en /verificar-paciente — si no existe (pacientes
+  // registrados antes de este cambio, o que omitieron el paso), se sigue
+  // usando id_photo como respaldo.
+  await sql`ALTER TABLE patients ADD COLUMN IF NOT EXISTS reference_photo TEXT`;
   patientsSchemaReady = true;
 }
 

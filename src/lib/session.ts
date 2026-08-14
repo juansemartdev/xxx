@@ -19,9 +19,14 @@ export type Session = {
   patientBloodType?: string;
   patientGender?: 'M' | 'F';
   // Foto del frente de la cédula (contiene la foto impresa de la persona),
-  // capturada en /registro. Se usa como referencia para el Face Match del
-  // paciente en /verificar-paciente.
+  // capturada en /registro. Se muestra como referencia visual, y se usa
+  // como respaldo para el Face Match si no hay patientReferencePhoto.
   patientIdPhoto?: string;
+  // Foto EN VIVO del paciente, capturada con Face Liveness durante el
+  // registro (no viene del documento). La cédula puede tener una foto de
+  // hace años; esta es la referencia preferida para el Face Match en
+  // /verificar-paciente.
+  patientReferencePhoto?: string;
 
   // Resultado de la verificación biométrica del paciente (Face Liveness +
   // Face Match contra la foto de la cédula) hecha en /verificar-paciente,

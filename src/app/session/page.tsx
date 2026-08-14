@@ -52,6 +52,7 @@ export default function Session() {
       patientBloodType: undefined,
       patientGender: undefined,
       patientIdPhoto: undefined,
+      patientReferencePhoto: undefined,
       patientVerified: null,
       patientLivenessConfidence: undefined,
       patientFaceMatchSimilarity: undefined,
@@ -93,6 +94,7 @@ export default function Session() {
         patientBloodType: json.bloodType || undefined,
         patientGender: json.gender === 'M' || json.gender === 'F' ? json.gender : undefined,
         patientIdPhoto: json.idPhotoBase64 || undefined,
+        patientReferencePhoto: json.referencePhotoBase64 || undefined,
         // Encontrarlo no verifica identidad: la prueba de vida + Face Match
         // se hace siempre en /verificar-paciente, cara a cara con la cámara.
         patientVerified: null,
@@ -124,6 +126,7 @@ export default function Session() {
       patientBloodType: undefined,
       patientGender: undefined,
       patientIdPhoto: undefined,
+      patientReferencePhoto: undefined,
       patientVerified: null,
       patientLivenessConfidence: undefined,
       patientFaceMatchSimilarity: undefined,

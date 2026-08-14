@@ -14,6 +14,10 @@ type PatientBody = {
   bloodType?: string;
   gender?: string;
   idPhotoBase64?: string;
+  // Foto en vivo (Face Liveness) capturada en /registro — ver notas en
+  // ensurePatientsSchema (src/lib/db.ts) sobre por qué es preferible a la
+  // foto de la cédula para el Face Match futuro.
+  referencePhotoBase64?: string;
 };
 
 // Guarda o actualiza un paciente (upsert por número de documento). Se llama
@@ -42,11 +46,11 @@ export async function POST(req: NextRequest) {
     await sql`
       INSERT INTO patients (
         document_number, first_name, middle_name, last_name, second_last_name,
-        birth_date, blood_type, gender, id_photo, updated_at
+        birth_date, blood_type, gender, id_photo, reference_photo, updated_at
       ) VALUES (
         ${documentNumber}, ${body.firstName}, ${body.middleName || null}, ${body.lastName},
         ${body.secondLastName || null}, ${body.birthDate || null}, ${body.bloodType || null},
-        ${body.gender || null}, ${body.idPhotoBase64 || null}, now()
+        ${body.gender || null}, ${body.idPhotoBase64 || null}, ${body.referencePhotoBase64 || null}, now()
       )
       ON CONFLICT (document_number) DO UPDATE SET
         first_name = EXCLUDED.first_name,
@@ -57,6 +61,11 @@ export async function POST(req: NextRequest) {
         blood_type = EXCLUDED.blood_type,
         gender = EXCLUDED.gender,
         id_photo = EXCLUDED.id_photo,
+        -- Solo se sobrescribe si esta vez SÍ llega una foto en vivo nueva;
+        -- así un profesional que reescanea la cédula (por ejemplo para
+        -- corregir un dato) sin repetir la captura de Face Liveness no
+        -- borra la referencia que ya existía.
+        reference_photo = COALESCE(EXCLUDED.reference_photo, patients.reference_photo),
         updated_at = now()
     `;
     return NextResponse.json({saved: true, documentNumber});
@@ -94,6 +103,7 @@ export async function GET(req: NextRequest) {
       bloodType: p.blood_type as string | null,
       gender: p.gender as string | null,
       idPhotoBase64: p.id_photo as string | null,
+      referencePhotoBase64: p.reference_photo as string | null,
     });
   } catch (err) {
     console.error('patients lookup error', err);

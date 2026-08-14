@@ -17,7 +17,11 @@ export default function VerificarPaciente() {
   const [ok, setOk] = useState(false);
   const [notes, setNotes] = useState('');
 
-  const hasIdPhoto = !!session.patientIdPhoto;
+  // Preferimos la foto EN VIVO capturada en /registro (más confiable,
+  // ver session.ts) y caemos a la foto de la cédula si no existe (pacientes
+  // registrados antes de este cambio, o que omitieron ese paso).
+  const referenceImage = session.patientReferencePhoto || session.patientIdPhoto;
+  const hasIdPhoto = !!referenceImage;
 
   async function onComplete(result: LivenessResult) {
     setStarted(false);
@@ -36,16 +40,16 @@ export default function VerificarPaciente() {
         return;
       }
 
-      if (!hasIdPhoto) {
-        // No hay foto de cédula para comparar (paciente de prueba / no
-        // registrado por cédula todavía): solo validamos prueba de vida.
+      if (!referenceImage) {
+        // No hay ninguna foto de referencia para comparar (paciente de
+        // prueba / no registrado todavía): solo validamos prueba de vida.
         updateSession({
           patientVerified: true,
           patientLivenessConfidence: result.confidence,
-          patientVerificationNotes: 'Prueba de vida confirmada. No había foto de cédula para comparar (paciente sin registrar).',
+          patientVerificationNotes: 'Prueba de vida confirmada. No había foto de referencia para comparar (paciente sin registrar).',
         });
         setOk(true);
-        setNotes('Prueba de vida confirmada. No se comparó contra una foto de cédula porque el paciente no está registrado.');
+        setNotes('Prueba de vida confirmada. No se comparó contra ninguna foto porque el paciente no está registrado.');
         setDone(true);
         return;
       }
@@ -54,7 +58,7 @@ export default function VerificarPaciente() {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          sourceImageBase64: session.patientIdPhoto,
+          sourceImageBase64: referenceImage,
           targetImageBase64: `data:image/jpeg;base64,${result.referenceImageBase64}`,
         }),
       });
@@ -67,14 +71,14 @@ export default function VerificarPaciente() {
         patientLivenessConfidence: result.confidence,
         patientFaceMatchSimilarity: json.similarity ?? 0,
         patientVerificationNotes: verified
-          ? 'Prueba de vida y coincidencia facial con la foto de la cédula confirmadas.'
-          : `El rostro capturado no coincide con la foto de la cédula (similitud ${Math.round(json.similarity ?? 0)}%).`,
+          ? 'Prueba de vida y coincidencia facial confirmadas.'
+          : `El rostro capturado no coincide con la foto de referencia (similitud ${Math.round(json.similarity ?? 0)}%).`,
       });
       setOk(verified);
       setNotes(
         verified
-          ? `Coincide con la foto de la cédula (similitud ${Math.round(json.similarity ?? 0)}%).`
-          : `No coincide con la foto de la cédula (similitud ${Math.round(json.similarity ?? 0)}%).`
+          ? `Coincide con la foto de referencia (similitud ${Math.round(json.similarity ?? 0)}%).`
+          : `No coincide con la foto de referencia (similitud ${Math.round(json.similarity ?? 0)}%).`
       );
       setDone(true);
     } catch (e) {
@@ -113,8 +117,8 @@ export default function VerificarPaciente() {
           <h1 className="text-2xl font-bold mt-2">Confirmar identidad del paciente</h1>
           <p className="sub">
             {hasIdPhoto
-              ? 'Vamos a confirmar que la persona presente es real (prueba de vida) y que coincide con la foto de su cédula.'
-              : 'Este paciente no tiene una foto de cédula registrada, así que solo confirmaremos prueba de vida.'}
+              ? 'Vamos a confirmar que la persona presente es real (prueba de vida) y que coincide con su foto de referencia.'
+              : 'Este paciente no tiene una foto de referencia registrada, así que solo confirmaremos prueba de vida.'}
           </p>
 
           {error && <p className="text-sm text-red-700 bg-red-50 rounded-md p-2 mt-3">{error}</p>}

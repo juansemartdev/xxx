@@ -3,13 +3,14 @@ import {useRouter} from 'next/navigation';
 import {useState} from 'react';
 import Header from '@/components/Header';
 import CameraCapture from '@/components/CameraCapture';
+import LivenessCheck, {type LivenessResult} from '@/components/LivenessCheck';
 import {updateSession} from '@/lib/session';
 import {scanPdf417} from '@/lib/scanIdBarcode';
 import {parseCedulaPdf417} from '@/lib/cedulaPdf417';
 import {readCedula} from '@/lib/readCedula';
 import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
-type Step = 'frente' | 'reverso' | 'form';
+type Step = 'frente' | 'reverso' | 'form' | 'foto-viva';
 
 export default function Registro() {
   useRequireProfessional();
@@ -31,6 +32,12 @@ export default function Registro() {
   const [birthDate, setBirthDate] = useState('');
   const [bloodType, setBloodType] = useState('');
   const [gender, setGender] = useState('');
+
+  // Foto EN VIVO del paciente (Face Liveness), capturada como referencia
+  // para el Face Match en /verificar-paciente — la foto de la cédula puede
+  // tener varios años y dejar de parecerse a la persona.
+  const [livenessStarted, setLivenessStarted] = useState(false);
+  const [livenessError, setLivenessError] = useState('');
 
   async function onFront(p: string) {
     setFrontPhoto(p);
@@ -96,7 +103,17 @@ export default function Registro() {
     }
   }
 
-  async function guardar() {
+  async function onLivenessComplete(result: LivenessResult) {
+    setLivenessStarted(false);
+    setLivenessError('');
+    if (!result.isLive || !result.referenceImageBase64) {
+      setLivenessError('No se confirmó una prueba de vida real. Puedes intentarlo de nuevo u omitir este paso.');
+      return;
+    }
+    await guardar(`data:image/jpeg;base64,${result.referenceImageBase64}`);
+  }
+
+  async function guardar(referencePhoto?: string) {
     const fullName = [firstName, middleName, lastName, secondLastName].filter(Boolean).join(' ');
     updateSession({
       patient: fullName || undefined,
@@ -109,8 +126,12 @@ export default function Registro() {
       patientBloodType: bloodType || undefined,
       patientGender: gender === 'M' || gender === 'F' ? gender : undefined,
       // Foto del frente de la cédula (trae la foto impresa de la persona),
-      // usada luego como referencia para el Face Match del paciente.
+      // se muestra como referencia visual y sirve de respaldo si no hay
+      // foto en vivo.
       patientIdPhoto: frontPhoto || undefined,
+      // Foto EN VIVO capturada justo arriba (Face Liveness) — preferida
+      // para el Face Match en /verificar-paciente, ver session.ts.
+      patientReferencePhoto: referencePhoto || undefined,
       // Un nuevo registro invalida cualquier verificación biométrica previa.
       patientVerified: null,
       patientLivenessConfidence: undefined,
@@ -138,6 +159,7 @@ export default function Registro() {
           bloodType,
           gender,
           idPhotoBase64: frontPhoto,
+          referencePhotoBase64: referencePhoto,
         }),
       });
       const json = await res.json();
@@ -253,16 +275,43 @@ export default function Registro() {
               />
             </div>
 
+            <button
+              disabled={!firstName || !lastName}
+              className="btn primary disabled:opacity-40"
+              onClick={() => setStep('foto-viva')}
+            >
+              Continuar
+            </button>
+          </>
+        )}
+
+        {step === 'foto-viva' && !livenessStarted && (
+          <>
+            <div className="card">
+              <label className="font-semibold">3 · Foto de referencia (en vivo)</label>
+              <p className="sub mt-2">
+                La foto de la cédula puede ser de hace varios años. Tomamos una foto en vivo del paciente ahora
+                mismo (misma prueba de vida que usa el profesional al ingresar) para que las verificaciones
+                futuras comparen contra una imagen reciente y confiable.
+              </p>
+            </div>
+
+            {livenessError && (
+              <p className="text-sm text-red-700 bg-red-50 rounded-md p-2">{livenessError}</p>
+            )}
             {saveError && (
               <p className="text-sm text-red-700 bg-red-50 rounded-md p-2">{saveError}</p>
             )}
 
             <button
-              disabled={!firstName || !lastName || saving}
               className="btn primary disabled:opacity-40"
-              onClick={guardar}
+              onClick={() => setLivenessStarted(true)}
+              disabled={saving}
             >
-              {saving ? 'Guardando…' : 'Guardar registro'}
+              Iniciar captura
+            </button>
+            <button className="btn secondary disabled:opacity-40" onClick={() => guardar()} disabled={saving}>
+              {saving ? 'Guardando…' : 'Omitir (usar solo foto de la cédula)'}
             </button>
             {saveError && (
               <button className="btn secondary" onClick={() => r.push('/')}>
@@ -270,6 +319,10 @@ export default function Registro() {
               </button>
             )}
           </>
+        )}
+
+        {step === 'foto-viva' && livenessStarted && (
+          <LivenessCheck onComplete={onLivenessComplete} onCancel={() => setLivenessStarted(false)} />
         )}
       </div>
     </>
