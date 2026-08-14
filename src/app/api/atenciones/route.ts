@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
       for (const m of medications) {
         const rows = await sql`
           INSERT INTO atencion_medicamentos (atencion_id, product, gtin, lot, expiry, notes)
-          VALUES (${atencionId}, ${m.product}, ${m.gtin || null}, ${m.lot || null}, ${m.expiry || null}, ${m.notes || null})
+          VALUES (${atencionId}, ${m.product as string}, ${m.gtin || null}, ${m.lot || null}, ${m.expiry || null}, ${m.notes || null})
           RETURNING id
         `;
         medicationIds.push(rows[0].id as number);
