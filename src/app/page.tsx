@@ -17,13 +17,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50">
       <main className="flex min-h-screen flex-col items-center justify-center px-6">
-        <img
-          src="/icons/icon.svg"
-          alt="Probattio"
-          className="h-20 w-20 rounded-3xl border border-slate-200 shadow-lg"
-        />
-        <h1 className="mt-5 text-2xl font-bold text-slate-900">Probattio</h1>
-        <p className="mt-2 text-sm text-slate-500">Trazabilidad digital de medicamentos</p>
+        <img src="/logo-wordmark.png" alt="Probattio" className="h-10 w-auto" />
+        <p className="mt-3 text-sm text-slate-500">Trazabilidad digital de medicamentos</p>
         <div className="mt-8 flex items-center gap-2 text-sm text-slate-500">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-teal-700" />
           Cargando…
