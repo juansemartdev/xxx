@@ -17,15 +17,19 @@ export default function Before() {
   const [expiry, setExpiry] = useState('');
   const [processing, setProcessing] = useState(false);
   const [weightMsg, setWeightMsg] = useState('');
+  const [weightReading, setWeightReading] = useState('');
   const [confidence, setConfidence] = useState<'alta' | 'media' | 'baja' | ''>('');
   const [codeMsg, setCodeMsg] = useState('');
+  const [rawCode, setRawCode] = useState('');
 
   async function done(p: string) {
     setPhoto(p);
     updateSession({beforePhoto: p});
     setProcessing(true);
     setWeightMsg('');
+    setWeightReading('');
     setCodeMsg('');
+    setRawCode('');
     setConfidence('');
 
     const [codeResult, weightResult] = await Promise.allSettled([
@@ -40,7 +44,8 @@ export default function Before() {
       if (data.expiry) setExpiry(data.expiry);
       updateSession({gtin: data.gtin, lot: data.lot, expiry: data.expiry, serial: data.serial});
       if (!data.gtin && !data.lot) {
-        setCodeMsg('Se detectó un código pero no se pudo interpretar como GS1. Completa los datos manualmente.');
+        setCodeMsg('Se detectó un código pero no tiene formato GS1 reconocido. Completa los datos manualmente.');
+        setRawCode(data.raw);
       }
     } else {
       setCodeMsg('No se detectó el código DataMatrix del vial. Completa GTIN/lote/vencimiento manualmente o vuelve a tomar la foto con el código más visible.');
@@ -50,6 +55,9 @@ export default function Before() {
       const result = weightResult.value;
       if (result.weight != null) setWeight(String(result.weight));
       setConfidence(result.confidence);
+      if (result.digitsSeen != null) {
+        setWeightReading(`${result.digitsSeen}${result.unit ? ' ' + result.unit : ''}`);
+      }
       if (result.confidence !== 'alta') {
         setWeightMsg(result.notes || 'Verifica el peso detectado antes de continuar.');
       }
@@ -92,6 +100,11 @@ export default function Before() {
           <div>
             <label className="font-semibold">Datos del vial (código DataMatrix)</label>
             {codeMsg && <p className="text-sm text-amber-600 mt-1">{codeMsg}</p>}
+            {rawCode && (
+              <p className="text-xs text-slate-400 mt-1 break-all">
+                Contenido crudo detectado: <span className="font-mono">{rawCode}</span>
+              </p>
+            )}
             <div className="mt-2 space-y-2">
               <input
                 value={gtin}
@@ -127,6 +140,12 @@ export default function Before() {
             className="mt-2 w-full rounded-xl border border-slate-200 p-4 text-xl"
           />
           {weightMsg && <p className="text-sm text-amber-600 mt-2">{weightMsg}</p>}
+          {weightReading && (
+            <p className="text-xs text-slate-400 mt-2">
+              Lectura del display: <span className="font-mono">{weightReading}</span> — verifica que coincida
+              con la báscula antes de continuar.
+            </p>
+          )}
           <p className="text-xs text-slate-500 mt-2">
             Detectado automáticamente a partir de la foto. Puedes corregirlo manualmente si es necesario.
           </p>

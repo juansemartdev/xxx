@@ -1,4 +1,6 @@
 export type WeightAnalysis = {
+  digitsSeen: string | null;
+  unit: string | null;
   weight: number | null;
   confidence: 'alta' | 'media' | 'baja';
   notes: string;

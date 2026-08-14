@@ -13,18 +13,22 @@ const MODEL = process.env.ANTHROPIC_VISION_MODEL || 'claude-sonnet-4-5';
 // estructurados. Este endpoint solo se encarga de lo que sí requiere
 // visión: leer el número que muestra el display de la báscula.
 type WeightAnalysis = {
+  digitsSeen: string | null;
+  unit: string | null;
   weight: number | null;
   confidence: 'alta' | 'media' | 'baja';
   notes: string;
 };
 
 const PROMPT = `Esta foto muestra un vial de medicamento colocado sobre una báscula digital. Tu única tarea es leer el número que muestra el display de la báscula. Responde EXCLUSIVAMENTE con un objeto JSON (sin texto adicional, sin markdown, sin explicación) con esta forma exacta:
-{"weight": number|null, "confidence": "alta"|"media"|"baja", "notes": string}
+{"digitsSeen": string|null, "unit": string|null, "weight": number|null, "confidence": "alta"|"media"|"baja", "notes": string}
 
 Reglas:
-- "weight": el número que muestra el display de la báscula, en gramos, como valor numérico (usa punto decimal, no coma). Si no puedes leer el display con certeza, usa null.
-- "confidence": "alta" si el display es claramente legible, "media" si hay dudas menores, "baja" si la imagen está borrosa, oscura, o el display no es claramente legible.
-- "notes": una frase breve en español explicando cualquier ambigüedad o motivo de baja confianza (cadena vacía si no hay ninguna).`;
+- "digitsSeen": copia EXACTA de los dígitos y el separador decimal (punto o coma) que muestra el display numérico de la báscula, y NADA MÁS. No incluyas ninguna letra de unidad (g, kg, lb, oz) aunque esté pegada o cerca del número. Por ejemplo, si el display muestra un "6" grande con una "g" pequeña de unidad al lado, digitsSeen debe ser exactamente "6" — nunca "6.9", "6g" ni ninguna variante que incorpore la "g". Si no puedes leer ningún dígito con certeza, usa null.
+- "unit": la unidad de medida que muestra el display, leída por separado de los dígitos (por ejemplo "g", "kg"), o null si no es claramente visible.
+- "weight": el valor numérico que representa exactamente "digitsSeen" (usa punto decimal, no coma), sin dígitos inventados ni redondeos. Si "digitsSeen" es null, "weight" también debe ser null.
+- "confidence": "alta" solo si el display es claramente legible y no hay ninguna ambigüedad entre los dígitos y la letra de unidad. "media" si hay dudas menores. "baja" si la imagen está borrosa, oscura, o el display no es claramente legible.
+- "notes": una frase breve en español explicando cualquier ambigüedad, el motivo de baja confianza, o si la unidad detectada no es gramos (cadena vacía si no hay ninguna).`;
 
 export async function POST(req: NextRequest) {
   if (!process.env.ANTHROPIC_API_KEY) {
