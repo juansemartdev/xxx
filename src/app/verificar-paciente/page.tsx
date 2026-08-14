@@ -4,8 +4,10 @@ import {useState} from 'react';
 import Header from '@/components/Header';
 import LivenessCheck, {type LivenessResult} from '@/components/LivenessCheck';
 import {getSession, updateSession} from '@/lib/session';
+import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
 export default function VerificarPaciente() {
+  useRequireProfessional();
   const r = useRouter();
   const [session] = useState(() => getSession());
   const [started, setStarted] = useState(false);
@@ -83,7 +85,7 @@ export default function VerificarPaciente() {
   }
 
   function continuar() {
-    r.push('/nfc');
+    r.push('/atenciones');
   }
 
   if (started) {
@@ -136,7 +138,7 @@ export default function VerificarPaciente() {
         {done && (
           <>
             <button className="btn primary" onClick={continuar}>
-              Continuar con empaque
+              Ver medicamentos pendientes
             </button>
             {!ok && (
               <button className="btn secondary" onClick={() => setDone(false)}>

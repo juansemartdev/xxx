@@ -101,3 +101,35 @@ export async function ensurePatientsSchema() {
   await sql`CREATE INDEX IF NOT EXISTS idx_patients_document ON patients (document_number)`;
   patientsSchemaReady = true;
 }
+
+let atencionesSchemaReady = false;
+
+// "Atenciones": medicamentos pendientes por aplicar a un paciente (producto,
+// lote, vencimiento). Las crea un sistema externo llamando a
+// POST /api/atenciones (protegido con ATENCIONES_API_KEY) — ChainDose no
+// las prescribe, solo las consume: el profesional las ve en /atenciones
+// después de identificar al paciente, elige una, y al cerrar la sesión de
+// dosis (ver /complete) queda marcada como "completada".
+export async function ensureAtencionesSchema() {
+  if (atencionesSchemaReady) return;
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS atenciones (
+      id SERIAL PRIMARY KEY,
+      document_number TEXT NOT NULL,
+      product TEXT NOT NULL,
+      gtin TEXT,
+      lot TEXT,
+      expiry TEXT,
+      notes TEXT,
+      external_reference TEXT,
+      status TEXT NOT NULL DEFAULT 'pendiente',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      completed_at TIMESTAMPTZ
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_atenciones_document ON atenciones (document_number)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_atenciones_status ON atenciones (status)`;
+  atencionesSchemaReady = true;
+}

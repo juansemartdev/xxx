@@ -1,13 +1,8 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {ensurePatientsSchema, getSql} from '@/lib/db';
+import {normalizeDocumentNumber} from '@/lib/patientDoc';
 
 export const runtime = 'nodejs';
-
-// Solo dígitos, para que "1.234.567" y "1234567" se traten como el mismo
-// documento sin importar cómo lo haya leído el OCR o el código de barras.
-function normalizeDocumentNumber(raw: string): string {
-  return raw.replace(/\D/g, '');
-}
 
 type PatientBody = {
   documentNumber?: string;

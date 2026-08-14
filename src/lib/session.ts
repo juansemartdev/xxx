@@ -32,6 +32,19 @@ export type Session = {
   patientVerified?: boolean | null;
   patientVerificationNotes?: string;
 
+  // Atención (medicamento pendiente) elegida en /atenciones — viene de un
+  // sistema externo que la creó vía POST /api/atenciones. beforeProduct/
+  // beforeLot/etc. abajo son lo que se LEE del vial físico al escanearlo;
+  // esto es lo PRESCRITO, solo informativo (no bloquea si no coincide).
+  atencionId?: number;
+  atencionProduct?: string;
+  atencionGtin?: string;
+  atencionLot?: string;
+  atencionExpiry?: string;
+  // Evita marcar la misma atención como completada más de una vez si el
+  // profesional recarga /complete.
+  atencionCompleted?: boolean;
+
   beforeProduct?: string;
   beforeGtin?: string;
   beforeLot?: string;
@@ -73,4 +86,16 @@ export function updateSession(p: Partial<Session>) {
 }
 export function clearSession() {
   localStorage.removeItem(KEY);
+}
+
+// Cierra la atención de UN paciente pero mantiene al profesional logueado,
+// para poder seguir atendiendo pacientes sin volver a pasar por Face
+// Liveness cada vez. Se usa en /complete al terminar una dosis ("Nueva
+// sesión" ya no cierra sesión del profesional, solo limpia al paciente y
+// los datos de la dosis). Para cerrar sesión de verdad, usar clearSession().
+export function startNewEncounter(): Session {
+  const s = getSession();
+  const kept: Session = {professional: s.professional};
+  localStorage.setItem(KEY, JSON.stringify(kept));
+  return kept;
 }

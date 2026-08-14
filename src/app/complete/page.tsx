@@ -2,10 +2,12 @@
 import {useEffect, useState} from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import {clearSession, getSession, updateSession, Session} from '@/lib/session';
+import {getSession, startNewEncounter, updateSession, Session} from '@/lib/session';
 import {appendHistory, deviationFromHistory} from '@/lib/history';
+import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
 export default function Complete() {
+  useRequireProfessional();
   const [s, setS] = useState<Session>({});
   const [auditReasons, setAuditReasons] = useState<string[]>([]);
 
@@ -75,6 +77,24 @@ export default function Complete() {
       );
     }
 
+    // Regla 6: lo escaneado del vial real no coincide con lo prescrito en
+    // la atención elegida (sistema externo). Solo informativo — no bloquea
+    // el flujo, pero queda registrado para auditoría.
+    if (session.atencionId) {
+      const scannedLot = session.beforeLot || session.afterLot;
+      if (session.atencionLot && scannedLot && session.atencionLot !== scannedLot) {
+        reasons.push(
+          `El lote escaneado del vial (${scannedLot}) no coincide con el prescrito en la atención (${session.atencionLot}).`
+        );
+      }
+      const scannedProduct = session.beforeProduct || session.afterProduct;
+      if (session.atencionProduct && scannedProduct && session.atencionProduct !== scannedProduct) {
+        reasons.push(
+          `El producto escaneado del vial (${scannedProduct}) no coincide con el prescrito en la atención (${session.atencionProduct}).`
+        );
+      }
+    }
+
     setAuditReasons(reasons);
 
     // Registramos esta sesión en el historial local (una sola vez) para
@@ -89,6 +109,21 @@ export default function Complete() {
       });
       updateSession({historyRecorded: true});
     }
+
+    // Marca la atención elegida como completada en el servidor, para que
+    // deje de aparecer en la lista de pendientes del paciente. Una sola
+    // vez por sesión (atencionCompleted evita reintentar en cada render).
+    if (session.atencionId && !session.atencionCompleted) {
+      updateSession({atencionCompleted: true});
+      fetch(`/api/atenciones/${session.atencionId}`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({status: 'completada'}),
+      }).catch(() => {
+        // No bloqueamos el cierre de sesión por esto; si falla, la atención
+        // queda pendiente y el profesional puede volver a elegirla luego.
+      });
+    }
   }, []);
 
   const diff =
@@ -102,7 +137,7 @@ export default function Complete() {
       <Header step="Sesión completada" />
       <div className="content space-y-5">
         <div className="card">
-          <div className="step">6 · Registro cerrado</div>
+          <div className="step">7 · Registro cerrado</div>
           <h1 className="text-3xl font-extrabold mt-2">✓ Sesión completa</h1>
           <div className="status text-green-700 bg-green-50 mt-4">
             <span className="dot" />
@@ -114,6 +149,15 @@ export default function Complete() {
             <span>Paciente</span>
             <b>{s.patient || '—'}</b>
           </div>
+          {s.atencionProduct && (
+            <div className="metric">
+              <span>Atención (prescrito)</span>
+              <b>
+                {s.atencionProduct}
+                {s.atencionLot ? ` · Lote ${s.atencionLot}` : ''}
+              </b>
+            </div>
+          )}
           <div className="metric">
             <span>Tag NFC</span>
             <b>{s.tagId || '—'}</b>
@@ -189,16 +233,19 @@ export default function Complete() {
         </div>
 
         <button
-          className="btn secondary"
+          className="btn primary"
           onClick={() => {
-            clearSession();
+            // Mantiene al profesional logueado — solo limpia el paciente y
+            // los datos de esta dosis, para poder seguir atendiendo sin
+            // volver a pasar por Face Liveness.
+            startNewEncounter();
             location.href = '/session';
           }}
         >
-          Nueva sesión
+          Atender otro paciente
         </button>
-        <Link href="/" className="btn primary block text-center">
-          Inicio
+        <Link href="/session" className="btn secondary block text-center">
+          Volver al inicio (sigues logueado)
         </Link>
       </div>
     </>

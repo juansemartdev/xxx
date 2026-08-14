@@ -6,8 +6,10 @@ import CameraCapture from '@/components/CameraCapture';
 import {getSession, updateSession} from '@/lib/session';
 import {useVialCapture} from '@/lib/useVialCapture';
 import {checkVialCondition} from '@/lib/vialCondition';
+import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
 export default function After() {
+  useRequireProfessional();
   const r = useRouter();
   const [photo, setPhoto] = useState('');
   const [beforeLot, setBeforeLot] = useState('');
@@ -80,7 +82,7 @@ export default function After() {
       <Header step="Vial · Después" />
       <div className="content space-y-5">
         <div className="card">
-          <div className="step">5 · Evidencia después</div>
+          <div className="step">6 · Evidencia después</div>
           <h1 className="text-2xl font-bold mt-2">Registrar vial después</h1>
           <p className="sub">Vuelve a colocar el vial en la balanza y captura una imagen equivalente.</p>
         </div>

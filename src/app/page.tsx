@@ -1,2 +1,28 @@
-import Link from 'next/link'; import Header from '@/components/Header';
-export default function Home(){return <><Header step="Trazabilidad digital de medicamentos"/><div className="content space-y-5"><div className="card"><div className="step">MVP V0.1</div><h1 className="text-3xl font-extrabold mt-2">Una sesión. Toda la evidencia.</h1><p className="sub mt-2">ChainDose usa el teléfono del profesional para NFC, cámara y captura de evidencia. La balanza permanece independiente.</p></div><div className="card space-y-3"><div className="metric"><span>Paciente</span><b>Identificar</b></div><div className="metric"><span>Empaque</span><b>NFC</b></div><div className="metric"><span>Vial</span><b>Foto + peso OCR</b></div><div className="metric"><span>Cierre</span><b>Antes / Después</b></div></div><Link href="/login" className="btn primary block text-center">Iniciar ChainDose</Link><Link href="/registro" className="btn secondary block text-center">Registro (escanear cédula)</Link></div></>}
+'use client';
+import {useEffect} from 'react';
+import {useRouter} from 'next/navigation';
+import Header from '@/components/Header';
+import {getSession} from '@/lib/session';
+
+// La primera pantalla de la app siempre es el login del profesional: si ya
+// hay uno autenticado en este dispositivo (localStorage), lo mandamos
+// directo a identificar/atender pacientes sin pedirle login de nuevo; si
+// no, al login. Ya no hay accesos sueltos como "Registro (escanear
+// cédula)" desde aquí — todo el flujo de paciente exige login primero.
+export default function Home() {
+  const r = useRouter();
+  useEffect(() => {
+    r.replace(getSession().professional ? '/session' : '/login');
+  }, [r]);
+
+  return (
+    <>
+      <Header step="Trazabilidad digital de medicamentos" />
+      <div className="content space-y-5">
+        <div className="card">
+          <p className="sub mt-2">Cargando…</p>
+        </div>
+      </div>
+    </>
+  );
+}

@@ -3,6 +3,7 @@ import {useRouter} from 'next/navigation';
 import {useEffect, useState} from 'react';
 import Header from '@/components/Header';
 import {getSession, updateSession, Session} from '@/lib/session';
+import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
 type Mode = 'confirm' | 'search' | 'notfound';
 
@@ -18,6 +19,7 @@ type Mode = 'confirm' | 'search' | 'notfound';
 // correcto, y si no, hay que buscarlo por cédula (ya guardado en el
 // servidor por /registro) o registrarlo de nuevo — nunca se asume solo.
 export default function Session() {
+  useRequireProfessional();
   const r = useRouter();
   const [session, setSession] = useState<Session>({});
   const [mode, setMode] = useState<Mode>('search');

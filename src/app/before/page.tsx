@@ -1,15 +1,25 @@
 'use client';
 import {useRouter} from 'next/navigation';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Header from '@/components/Header';
 import CameraCapture from '@/components/CameraCapture';
-import {updateSession} from '@/lib/session';
+import {getSession, updateSession} from '@/lib/session';
 import {useVialCapture} from '@/lib/useVialCapture';
+import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
 export default function Before() {
+  useRequireProfessional();
   const r = useRouter();
   const [photo, setPhoto] = useState('');
+  const [atencion, setAtencion] = useState<{product?: string; lot?: string; expiry?: string} | null>(null);
   const vial = useVialCapture();
+
+  useEffect(() => {
+    const s = getSession();
+    if (s.atencionId) {
+      setAtencion({product: s.atencionProduct, lot: s.atencionLot, expiry: s.atencionExpiry});
+    }
+  }, []);
 
   async function done(p: string) {
     setPhoto(p);
@@ -40,13 +50,27 @@ export default function Before() {
       <Header step="Vial · Antes" />
       <div className="content space-y-5">
         <div className="card">
-          <div className="step">4 · Evidencia antes</div>
+          <div className="step">5 · Evidencia antes</div>
           <h1 className="text-2xl font-bold mt-2">Fotografía + peso</h1>
           <p className="sub">
             Coloca el vial sobre una balanza convencional. La cámara debe incluir el vial (con su código
             DataMatrix visible) y el display de la báscula.
           </p>
         </div>
+
+        {atencion && (
+          <div className="card">
+            <label className="font-semibold">Prescrito (atención seleccionada)</label>
+            <p className="text-sm text-slate-500 mt-1">
+              {atencion.product}
+              {atencion.lot && <> · Lote: {atencion.lot}</>}
+              {atencion.expiry && <> · Vence: {atencion.expiry}</>}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              Solo informativo — compara contra lo que leas del vial físico abajo.
+            </p>
+          </div>
+        )}
 
         <CameraCapture onCapture={done} />
 

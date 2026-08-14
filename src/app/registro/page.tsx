@@ -7,10 +7,12 @@ import {updateSession} from '@/lib/session';
 import {scanPdf417} from '@/lib/scanIdBarcode';
 import {parseCedulaPdf417} from '@/lib/cedulaPdf417';
 import {readCedula} from '@/lib/readCedula';
+import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
 type Step = 'frente' | 'reverso' | 'form';
 
 export default function Registro() {
+  useRequireProfessional();
   const r = useRouter();
   const [step, setStep] = useState<Step>('frente');
   const [frontPhoto, setFrontPhoto] = useState('');
