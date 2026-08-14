@@ -2,7 +2,8 @@
 import {useRouter} from 'next/navigation';
 import {useEffect, useState} from 'react';
 import Header from '@/components/Header';
-import {getSession, updateSession, Session} from '@/lib/session';
+import {getSession, updateSession} from '@/lib/session';
+import type {Session as SessionState} from '@/lib/session';
 import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
 type Mode = 'confirm' | 'search' | 'notfound';
@@ -21,7 +22,7 @@ type Mode = 'confirm' | 'search' | 'notfound';
 export default function Session() {
   useRequireProfessional();
   const r = useRouter();
-  const [session, setSession] = useState<Session>({});
+  const [session, setSession] = useState<SessionState>({});
   const [mode, setMode] = useState<Mode>('search');
   const [documentInput, setDocumentInput] = useState('');
   const [searching, setSearching] = useState(false);
