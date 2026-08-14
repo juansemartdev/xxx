@@ -84,14 +84,21 @@ export async function POST(req: NextRequest) {
       // Acepta tanto el atajo (product/gtin/lot/expiry directo en el
       // objeto, para el caso de un solo medicamento) como el array
       // "medications" (para varios medicamentos en la misma atención).
-      const medications: MedicationInput[] =
+      const rawMedications: MedicationInput[] =
         Array.isArray(item.medications) && item.medications.length > 0
           ? item.medications
           : item.product
             ? [{product: item.product, gtin: item.gtin, lot: item.lot, expiry: item.expiry}]
             : [];
 
-      if (medications.length === 0 || medications.some((m) => !m.product)) {
+      // El type predicate deja "product" tipado como string (no
+      // string | undefined) para las filas de abajo — sql (postgres.js)
+      // no acepta undefined como parámetro.
+      const medications = rawMedications.filter(
+        (m): m is MedicationInput & {product: string} => !!m.product
+      );
+
+      if (medications.length === 0 || medications.length !== rawMedications.length) {
         return NextResponse.json(
           {error: 'Cada atención requiere al menos un medicamento con "product" (directo o dentro de "medications").', item},
           {status: 400}
