@@ -20,7 +20,7 @@ export default function Home() {
         <img src="/logo-wordmark.png" alt="Probattio" className="h-10 w-auto" />
         <p className="mt-3 text-sm text-slate-500">Trazabilidad digital de medicamentos</p>
         <div className="mt-8 flex items-center gap-2 text-sm text-slate-500">
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-700" />
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-700" />
           Cargando…
         </div>
       </main>

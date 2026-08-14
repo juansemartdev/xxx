@@ -160,7 +160,7 @@ export default function Session() {
 
             <div className="mt-6 space-y-3">
               <button
-                className="min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
+                className="min-h-12 w-full rounded-xl bg-emerald-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
                 onClick={goVerify}
               >
                 Sí, es este paciente — continuar
@@ -192,7 +192,7 @@ export default function Session() {
                   onChange={(e) => setDocumentInput(e.target.value)}
                   placeholder="Ej. 1030123456"
                   inputMode="numeric"
-                  className="min-h-12 w-full rounded-xl border border-slate-300 px-4 text-lg outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
+                  className="min-h-12 w-full rounded-xl border border-slate-300 px-4 text-lg outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
                 />
               </label>
 
@@ -204,7 +204,7 @@ export default function Session() {
               )}
 
               <button
-                className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm disabled:opacity-70 active:scale-[0.98]"
+                className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 font-semibold text-white shadow-sm disabled:opacity-70 active:scale-[0.98]"
                 onClick={buscar}
                 disabled={searching}
               >

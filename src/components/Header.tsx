@@ -101,14 +101,14 @@ export default function Header({stepIndex, stepSuffix, stepLabel, totalSteps = 6
         {stepIndex && stepLabel && (
           <div className="mx-auto max-w-xl px-4 pb-3">
             <div className="mb-2 flex justify-between text-xs font-semibold">
-              <span className="text-blue-700">{stepText}</span>
+              <span className="text-emerald-700">{stepText}</span>
               <span className="text-slate-500">{stepLabel}</span>
             </div>
             <div className="flex gap-1.5">
               {Array.from({length: totalSteps}, (_, i) => (
                 <span
                   key={i}
-                  className={`h-1.5 flex-1 rounded-full ${i < stepIndex ? 'bg-blue-700' : 'bg-slate-200'}`}
+                  className={`h-1.5 flex-1 rounded-full ${i < stepIndex ? 'bg-emerald-700' : 'bg-slate-200'}`}
                 />
               ))}
             </div>

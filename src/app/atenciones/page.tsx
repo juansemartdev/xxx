@@ -167,7 +167,7 @@ export default function Atenciones() {
                           <p className="font-bold text-slate-900">{m.product}</p>
                           {m.gtin && <p className="mt-1 text-sm text-slate-500">GTIN {m.gtin}</p>}
                         </div>
-                        <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                           Pendiente
                         </span>
                       </div>

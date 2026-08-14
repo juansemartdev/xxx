@@ -98,7 +98,7 @@ export default function Before() {
 
         {vial.processing && (
           <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-700" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-700" />
             Leyendo datos del vial y báscula…
           </div>
         )}
@@ -121,34 +121,34 @@ export default function Before() {
               value={vial.product}
               onChange={(e) => vial.setProduct(e.target.value)}
               placeholder="Producto"
-              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
             />
             <input
               value={vial.gtin}
               onChange={(e) => vial.setGtin(e.target.value)}
               placeholder="GTIN"
-              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
             />
             <input
               value={vial.lot}
               onChange={(e) => vial.setLot(e.target.value)}
               placeholder="Lote"
-              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
             />
             <input
               value={vial.expiry}
               onChange={(e) => vial.setExpiry(e.target.value)}
               placeholder="Vencimiento (AAAA-MM-DD)"
-              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
             />
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+        <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-blue-900">Peso</p>
-              <p className="mt-1 text-xs text-blue-800">Detectado automáticamente · puedes corregirlo</p>
+              <p className="font-semibold text-emerald-900">Peso</p>
+              <p className="mt-1 text-xs text-emerald-800">Detectado automáticamente · puedes corregirlo</p>
             </div>
             <div className="flex items-baseline gap-1">
               <input
@@ -156,14 +156,14 @@ export default function Before() {
                 onChange={(e) => vial.setWeight(e.target.value)}
                 placeholder="0.000"
                 inputMode="decimal"
-                className="w-28 bg-transparent text-right text-4xl font-bold tabular-nums text-blue-950 outline-none"
+                className="w-28 bg-transparent text-right text-4xl font-bold tabular-nums text-emerald-950 outline-none"
               />
-              <span className="font-semibold text-blue-800">g</span>
+              <span className="font-semibold text-emerald-800">g</span>
             </div>
           </div>
           {vial.weightMsg && <p className="mt-3 text-sm text-amber-700">{vial.weightMsg}</p>}
           {vial.weightReading && (
-            <p className="mt-2 text-xs text-blue-800/70">
+            <p className="mt-2 text-xs text-emerald-800/70">
               Lectura del display: <span className="font-mono">{vial.weightReading}</span> — verifica que coincida
               con la báscula antes de continuar.
             </p>
@@ -172,7 +172,7 @@ export default function Before() {
 
         <button
           disabled={!photo || !vial.weight}
-          className="mt-4 min-h-12 w-full rounded-xl bg-blue-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
+          className="mt-4 min-h-12 w-full rounded-xl bg-emerald-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
           onClick={confirm}
         >
           Confirmar ANTES

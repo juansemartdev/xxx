@@ -104,12 +104,16 @@ export async function ensurePatientsSchema() {
 
 let atencionesSchemaReady = false;
 
-// "Atenciones": medicamentos pendientes por aplicar a un paciente (producto,
-// lote, vencimiento). Las crea un sistema externo llamando a
-// POST /api/atenciones (protegido con ATENCIONES_API_KEY) — Probattio no
-// las prescribe, solo las consume: el profesional las ve en /atenciones
-// después de identificar al paciente, elige una, y al cerrar la sesión de
-// dosis (ver /complete) queda marcada como "completada".
+// "Atenciones": una orden/prescripción para un paciente, creada por un
+// sistema externo llamando a POST /api/atenciones (protegido con
+// ATENCIONES_API_KEY) — Probattio no las prescribe, solo las consume. Cada
+// atención es solo el "encabezado" (paciente + referencia externa); los
+// medicamentos que trae (uno o varios) viven en atencion_medicamentos,
+// abajo. El profesional las ve en /atenciones después de identificar al
+// paciente, elige UN medicamento específico, y al cerrar la sesión de
+// dosis (ver /complete) ESE medicamento queda marcado como "completada"
+// (ver PATCH /api/atenciones/medications/:id) — el estado de la atención
+// se recalcula solo a partir de sus medicamentos.
 export async function ensureAtencionesSchema() {
   if (atencionesSchemaReady) return;
   const sql = getSql();
@@ -117,12 +121,8 @@ export async function ensureAtencionesSchema() {
     CREATE TABLE IF NOT EXISTS atenciones (
       id SERIAL PRIMARY KEY,
       document_number TEXT NOT NULL,
-      product TEXT NOT NULL,
-      gtin TEXT,
-      lot TEXT,
-      expiry TEXT,
-      notes TEXT,
       external_reference TEXT,
+      notes TEXT,
       status TEXT NOT NULL DEFAULT 'pendiente',
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -131,5 +131,44 @@ export async function ensureAtencionesSchema() {
   `;
   await sql`CREATE INDEX IF NOT EXISTS idx_atenciones_document ON atenciones (document_number)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_atenciones_status ON atenciones (status)`;
+
+  // Un medicamento específico dentro de una atención (producto, lote,
+  // vencimiento prescritos) más toda la evidencia que se le adjunta al
+  // completarlo (fotos y pesos antes/después, condición del vial). Una
+  // atención puede tener varios — cada uno se administra y se completa por
+  // separado.
+  await sql`
+    CREATE TABLE IF NOT EXISTS atencion_medicamentos (
+      id SERIAL PRIMARY KEY,
+      atencion_id INTEGER NOT NULL REFERENCES atenciones (id) ON DELETE CASCADE,
+      product TEXT NOT NULL,
+      gtin TEXT,
+      lot TEXT,
+      expiry TEXT,
+      notes TEXT,
+      status TEXT NOT NULL DEFAULT 'pendiente',
+      before_photo TEXT,
+      before_product TEXT,
+      before_gtin TEXT,
+      before_lot TEXT,
+      before_expiry TEXT,
+      before_weight DOUBLE PRECISION,
+      after_photo TEXT,
+      after_product TEXT,
+      after_gtin TEXT,
+      after_lot TEXT,
+      after_expiry TEXT,
+      after_weight DOUBLE PRECISION,
+      vial_looks_opened BOOLEAN,
+      vial_condition_confidence TEXT,
+      vial_condition_notes TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      completed_at TIMESTAMPTZ
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_atencion_medicamentos_atencion ON atencion_medicamentos (atencion_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_atencion_medicamentos_status ON atencion_medicamentos (status)`;
+
   atencionesSchemaReady = true;
 }

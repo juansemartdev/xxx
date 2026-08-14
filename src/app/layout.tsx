@@ -30,7 +30,7 @@ export const viewport: Viewport = {
   // globals.css evitan que el contenido quede debajo del notch/isla
   // dinámica cuando la app corre en pantalla completa (modo standalone).
   viewportFit: 'cover',
-  themeColor: '#1D4ED8',
+  themeColor: '#047857',
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
