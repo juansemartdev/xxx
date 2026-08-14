@@ -1,7 +1,6 @@
 'use client';
 import {useRouter} from 'next/navigation';
 import {useState} from 'react';
-import Header from '@/components/Header';
 import LivenessCheck, {type LivenessResult} from '@/components/LivenessCheck';
 import {updateSession} from '@/lib/session';
 
@@ -113,12 +112,10 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header />
       <main className="mx-auto max-w-xl px-4 pb-8">
-        <div className="text-center py-5">
-          <img src="/logo-wordmark.png" alt="Probattio" className="mx-auto h-8 w-auto" />
-          <h1 className="mt-4 text-2xl font-bold text-slate-900">Entrar a Probattio</h1>
-          <p className="mt-2 text-sm text-slate-500">
+        <div className="text-center py-8">
+          <img src="/logo-wordmark.png" alt="Probattio" className="mx-auto h-10 w-auto" />
+          <p className="mt-4 text-sm text-slate-500">
             Verificación biométrica con prueba de vida (Face Liveness) y comparación facial, provista por AWS
             Rekognition.
           </p>
