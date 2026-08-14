@@ -7,11 +7,13 @@ import {updateSession} from '@/lib/session';
 import {analyzeVialWeight} from '@/lib/analyzeVial';
 import {scanDataMatrix} from '@/lib/scanDataMatrix';
 import {parseGS1} from '@/lib/gs1';
+import {readVialLabel} from '@/lib/readLabel';
 
 export default function Before() {
   const r = useRouter();
   const [photo, setPhoto] = useState('');
   const [weight, setWeight] = useState('');
+  const [product, setProduct] = useState('');
   const [gtin, setGtin] = useState('');
   const [lot, setLot] = useState('');
   const [expiry, setExpiry] = useState('');
@@ -21,6 +23,54 @@ export default function Before() {
   const [confidence, setConfidence] = useState<'alta' | 'media' | 'baja' | ''>('');
   const [codeMsg, setCodeMsg] = useState('');
   const [rawCode, setRawCode] = useState('');
+
+  // Cadena de respaldo para los datos del vial (producto/GTIN/lote/vencimiento):
+  //   1. DataMatrix leído como GS1 (HRI o "plano" — ver src/lib/gs1.ts).
+  //   2. Si el DataMatrix no se pudo interpretar como GS1 en ningún
+  //      formato (o no se detectó ningún código), leer la etiqueta
+  //      impresa por OCR/visión como último recurso.
+  async function resolveVialData(photoDataUrl: string) {
+    const code = await scanDataMatrix(photoDataUrl);
+
+    if (code) {
+      const data = parseGS1(code);
+      if (data.gtin || data.lot) {
+        if (data.gtin) setGtin(data.gtin);
+        if (data.lot) setLot(data.lot);
+        if (data.expiry) setExpiry(data.expiry);
+        updateSession({gtin: data.gtin, lot: data.lot, expiry: data.expiry, serial: data.serial});
+        setCodeMsg('');
+        return;
+      }
+      // Se detectó un código pero no se pudo interpretar como GS1 (ni
+      // HRI ni plano). Lo mostramos para referencia y caemos a OCR.
+      setRawCode(code);
+      setCodeMsg('El código detectado no tiene formato GS1 reconocido. Leyendo la etiqueta con IA…');
+    } else {
+      setCodeMsg('No se detectó código DataMatrix. Leyendo la etiqueta con IA…');
+    }
+
+    try {
+      const label = await readVialLabel(photoDataUrl);
+      if (label.product) setProduct(label.product);
+      if (label.lot) setLot(label.lot);
+      if (label.expiry) setExpiry(label.expiry);
+      updateSession({product: label.product || undefined, lot: label.lot || undefined, expiry: label.expiry || undefined});
+      if (label.confidence === 'alta' && (label.product || label.lot)) {
+        setCodeMsg('No se detectó código; datos leídos por IA desde la etiqueta. Verifica que sean correctos.');
+      } else {
+        setCodeMsg(
+          label.notes ||
+            'No se pudo leer el código ni la etiqueta con confianza. Completa los datos manualmente.'
+        );
+      }
+    } catch {
+      setCodeMsg(
+        (code ? 'El código no es GS1 reconocible y ' : '') +
+          'no se pudo leer la etiqueta automáticamente. Completa los datos manualmente.'
+      );
+    }
+  }
 
   async function done(p: string) {
     setPhoto(p);
@@ -32,24 +82,10 @@ export default function Before() {
     setRawCode('');
     setConfidence('');
 
-    const [codeResult, weightResult] = await Promise.allSettled([
-      scanDataMatrix(p),
+    const [, weightResult] = await Promise.allSettled([
+      resolveVialData(p),
       analyzeVialWeight(p),
     ]);
-
-    if (codeResult.status === 'fulfilled' && codeResult.value) {
-      const data = parseGS1(codeResult.value);
-      if (data.gtin) setGtin(data.gtin);
-      if (data.lot) setLot(data.lot);
-      if (data.expiry) setExpiry(data.expiry);
-      updateSession({gtin: data.gtin, lot: data.lot, expiry: data.expiry, serial: data.serial});
-      if (!data.gtin && !data.lot) {
-        setCodeMsg('Se detectó un código pero no tiene formato GS1 reconocido. Completa los datos manualmente.');
-        setRawCode(data.raw);
-      }
-    } else {
-      setCodeMsg('No se detectó el código DataMatrix del vial. Completa GTIN/lote/vencimiento manualmente o vuelve a tomar la foto con el código más visible.');
-    }
 
     if (weightResult.status === 'fulfilled') {
       const result = weightResult.value;
@@ -72,6 +108,7 @@ export default function Before() {
     const n = Number(weight.replace(',', '.'));
     updateSession({
       beforeWeight: Number.isFinite(n) ? n : undefined,
+      product: product || undefined,
       gtin: gtin || undefined,
       lot: lot || undefined,
       expiry: expiry || undefined,
@@ -94,18 +131,24 @@ export default function Before() {
 
         <CameraCapture onCapture={done} />
 
-        {processing && <p className="text-sm text-slate-500">Leyendo código del vial y báscula…</p>}
+        {processing && <p className="text-sm text-slate-500">Leyendo datos del vial y báscula…</p>}
 
         <div className="card space-y-3">
           <div>
-            <label className="font-semibold">Datos del vial (código DataMatrix)</label>
+            <label className="font-semibold">Datos del vial</label>
             {codeMsg && <p className="text-sm text-amber-600 mt-1">{codeMsg}</p>}
             {rawCode && (
               <p className="text-xs text-slate-400 mt-1 break-all">
-                Contenido crudo detectado: <span className="font-mono">{rawCode}</span>
+                Contenido crudo del código: <span className="font-mono">{rawCode}</span>
               </p>
             )}
             <div className="mt-2 space-y-2">
+              <input
+                value={product}
+                onChange={(e) => setProduct(e.target.value)}
+                placeholder="Producto"
+                className="w-full rounded-xl border border-slate-200 p-3"
+              />
               <input
                 value={gtin}
                 onChange={(e) => setGtin(e.target.value)}
