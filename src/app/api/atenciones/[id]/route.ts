@@ -3,12 +3,10 @@ import {ensureAtencionesSchema, getSql} from '@/lib/db';
 
 export const runtime = 'nodejs';
 
-// PATCH /api/atenciones/:id — actualización administrativa del
-// ENCABEZADO de una atención (por ejemplo, para cancelarla o anotarla).
-// El flujo normal de ChainDose NO usa esta ruta para marcar avance: cada
-// medicamento se completa individualmente vía
-// PATCH /api/atenciones/medications/:id, y el estado de la atención se
-// recalcula solo a partir de sus medicamentos (ver esa ruta).
+// PATCH /api/atenciones/:id — la llama la app Probattio al cerrar una
+// sesión de dosis (ver /complete) para marcar esa atención como
+// "completada" y que deje de aparecer en la lista de pendientes del
+// paciente.
 export async function PATCH(req: NextRequest, {params}: {params: Promise<{id: string}>}) {
   const {id: idParam} = await params;
   const id = Number(idParam);
@@ -16,24 +14,20 @@ export async function PATCH(req: NextRequest, {params}: {params: Promise<{id: st
     return NextResponse.json({error: 'Id de atención inválido.'}, {status: 400});
   }
 
-  let body: {status?: string; notes?: string};
+  let body: {status?: string};
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({error: 'Cuerpo de solicitud inválido.'}, {status: 400});
   }
-  if (!body.status && body.notes === undefined) {
-    return NextResponse.json({error: 'Nada para actualizar (status o notes).'}, {status: 400});
-  }
+  const status = body.status || 'completada';
 
   try {
     await ensureAtencionesSchema();
     const sql = getSql();
     const rows = await sql`
-      UPDATE atenciones SET
-        status = COALESCE(${body.status ?? null}, status),
-        notes = COALESCE(${body.notes ?? null}, notes),
-        updated_at = now()
+      UPDATE atenciones
+      SET status = ${status}, updated_at = now(), completed_at = now()
       WHERE id = ${id}
       RETURNING id
     `;
@@ -42,7 +36,7 @@ export async function PATCH(req: NextRequest, {params}: {params: Promise<{id: st
     }
     return NextResponse.json({updated: true});
   } catch (err) {
-    console.error('atencion header update error', err);
+    console.error('atenciones update error', err);
     const msg = err instanceof Error ? err.message : 'Error interno.';
     return NextResponse.json({error: msg}, {status: 500});
   }

@@ -1,1 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0F766E"/><path d="M140 275c55-92 112-92 167 0 25 42 47 42 65 4" fill="none" stroke="white" stroke-width="38" stroke-linecap="round"/><circle cx="140" cy="275" r="24" fill="white"/><circle cx="372" cy="279" r="24" fill="white"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="ttGrad" x1="146" y1="150" x2="366" y2="362" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2F6FEB"/>
+      <stop offset="100%" stop-color="#2FBF8F"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#FFFFFF"/>
+  <rect x="4" y="4" width="504" height="504" rx="108" fill="none" stroke="#E2E8F0" stroke-width="8"/>
+  <!-- Monograma "TT" de Probattio -->
+  <rect x="146" y="150" width="100" height="32" rx="6" fill="url(#ttGrad)"/>
+  <rect x="180" y="182" width="32" height="180" rx="6" fill="url(#ttGrad)"/>
+  <rect x="266" y="150" width="100" height="32" rx="6" fill="url(#ttGrad)"/>
+  <rect x="300" y="182" width="32" height="180" rx="6" fill="url(#ttGrad)"/>
+</svg>

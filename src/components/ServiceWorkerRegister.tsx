@@ -1,7 +1,7 @@
 'use client';
 import {useEffect} from 'react';
 
-// Registra el service worker (public/sw.js) para que ChainDose sea
+// Registra el service worker (public/sw.js) para que Probattio sea
 // instalable como PWA. Sin esto, la mayoría de navegadores Android/Chrome
 // no ofrecen "Agregar a pantalla de inicio" aunque el manifest esté bien
 // configurado.

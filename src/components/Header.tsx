@@ -38,10 +38,8 @@ export default function Header({stepIndex, stepSuffix, stepLabel, totalSteps = 7
       <div className="mx-auto flex max-w-xl items-center justify-between px-4 py-3">
         <div>
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-700 text-sm font-bold text-white">
-              CD
-            </div>
-            <span className="text-lg font-bold text-slate-900">ChainDose</span>
+            <img src="/icons/icon.svg" alt="Probattio" className="h-9 w-9 rounded-xl border border-slate-200" />
+            <span className="text-lg font-bold text-slate-900">Probattio</span>
           </div>
           {(professional || stepText) && (
             <p className="mt-1 text-xs text-slate-500">

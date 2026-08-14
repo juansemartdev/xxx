@@ -3,7 +3,7 @@ import './globals.css';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 
 export const metadata: Metadata = {
-  title: 'ChainDose',
+  title: 'Probattio',
   description: 'Trazabilidad digital de administración de medicamentos',
   manifest: '/manifest.webmanifest',
   // Permite "Agregar a pantalla de inicio" en iOS Safari con apariencia de
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'ChainDose',
+    title: 'Probattio',
   },
   icons: {
     icon: [

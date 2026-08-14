@@ -1,4 +1,4 @@
-# ChainDose PWA — V0.1
+# Probattio PWA — V0.1
 
 MVP mobile-first para trazabilidad digital de administración de medicamentos.
 

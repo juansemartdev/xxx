@@ -1,6 +1,6 @@
 import {NextRequest} from 'next/server';
 
-export const RP_NAME = 'ChainDose';
+export const RP_NAME = 'Probattio';
 
 // Deriva el RP ID (dominio) y el origin esperado a partir de la propia
 // solicitud, en vez de hardcodear un dominio. Así funciona igual en
