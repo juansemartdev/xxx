@@ -111,9 +111,9 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <main className="mx-auto max-w-xl px-4 pb-8">
-        <div className="text-center py-8">
+    <div className="flex min-h-screen flex-col justify-center bg-slate-50">
+      <main className="mx-auto w-full max-w-xl px-4 py-8">
+        <div className="text-center pb-8">
           <img src="/logo-wordmark.png" alt="Probattio" className="mx-auto h-10 w-auto" />
           <p className="mt-4 text-sm text-slate-500">
             Verificación biométrica con prueba de vida (Face Liveness) y comparación facial, provista por AWS
