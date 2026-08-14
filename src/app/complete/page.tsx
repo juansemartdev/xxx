@@ -66,6 +66,15 @@ export default function Complete() {
       );
     }
 
+    // Regla 5: la verificación biométrica del paciente (prueba de vida +
+    // coincidencia facial con la foto de la cédula) falló o no se hizo.
+    if (session.patientVerified === false) {
+      reasons.push(
+        session.patientVerificationNotes ||
+          'La verificación biométrica del paciente no coincide o no se pudo confirmar presencia real.'
+      );
+    }
+
     setAuditReasons(reasons);
 
     // Registramos esta sesión en el historial local (una sola vez) para
@@ -144,6 +153,16 @@ export default function Complete() {
           <div className="metric">
             <span>Diferencia de masa</span>
             <b>{diff} g</b>
+          </div>
+          <div className="metric">
+            <span>Verificación de identidad del paciente</span>
+            <b>
+              {s.patientVerified === true
+                ? '✓ Confirmada'
+                : s.patientVerified === false
+                ? '✗ No confirmada'
+                : '— No realizada'}
+            </b>
           </div>
         </div>
 

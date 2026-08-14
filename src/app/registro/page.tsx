@@ -104,6 +104,14 @@ export default function Registro() {
       patientBirthDate: birthDate || undefined,
       patientBloodType: bloodType || undefined,
       patientGender: gender === 'M' || gender === 'F' ? gender : undefined,
+      // Foto del frente de la cédula (trae la foto impresa de la persona),
+      // usada luego como referencia para el Face Match del paciente.
+      patientIdPhoto: frontPhoto || undefined,
+      // Un nuevo registro invalida cualquier verificación biométrica previa.
+      patientVerified: null,
+      patientLivenessConfidence: undefined,
+      patientFaceMatchSimilarity: undefined,
+      patientVerificationNotes: undefined,
     });
     r.push('/');
   }
