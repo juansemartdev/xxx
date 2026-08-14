@@ -214,7 +214,7 @@ export default function Registro() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {!capturandoEnVivo && <Header stepIndex={2} stepLabel="Registro" />}
+      {!capturandoEnVivo && <Header stepIndex={1} stepLabel="Registro" />}
       <main className="mx-auto max-w-xl px-4 py-4">
         {!capturandoEnVivo && (
           <div className="py-4">

@@ -70,7 +70,7 @@ export default function Before() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header stepIndex={5} stepLabel="Evidencia antes" />
+      <Header stepIndex={4} stepLabel="Evidencia antes" />
       <main className="mx-auto max-w-xl px-4 pb-8">
         <div className="py-4">
           <h1 className="text-2xl font-bold text-slate-900">Registra el estado antes</h1>

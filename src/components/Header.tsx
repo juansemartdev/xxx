@@ -4,19 +4,18 @@ import {useRouter} from 'next/navigation';
 import {clearSession, getSession} from '@/lib/session';
 
 type Props = {
-  // Paso actual dentro del flujo de 7 pasos (1-7). Si se omite, no se
+  // Paso actual dentro del flujo de 6 pasos (1-6). Si se omite, no se
   // muestra la barra de progreso (se usa en pantallas fuera del flujo
-  // numerado, como splash o el resumen final).
+  // numerado, como splash, login o el resumen final).
   stepIndex?: number;
-  // Sufijo del paso, p.ej. "b" para "2b" (verificación, sub-paso de
-  // "2 · Paciente").
+  // Sufijo del paso, p.ej. "1b" (verificación, sub-paso de "1 · Paciente").
   stepSuffix?: string;
   // Nombre de la sección para la barra de progreso, p.ej. "Paciente".
   stepLabel?: string;
   totalSteps?: number;
 };
 
-export default function Header({stepIndex, stepSuffix, stepLabel, totalSteps = 7}: Props) {
+export default function Header({stepIndex, stepSuffix, stepLabel, totalSteps = 6}: Props) {
   const r = useRouter();
   // Se lee en useEffect (no en el primer render) porque localStorage no
   // existe en el servidor — evita un mismatch de hidratación en Next.js.
@@ -34,12 +33,11 @@ export default function Header({stepIndex, stepSuffix, stepLabel, totalSteps = 7
   const stepText = stepIndex ? `Paso ${stepIndex}${stepSuffix || ''} de ${totalSteps}` : undefined;
 
   return (
-    <header className="safe-top sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <header className="safe-top sticky top-0 z-20 border-b border-slate-200 bg-white">
       <div className="mx-auto flex max-w-xl items-center justify-between px-4 py-3">
         <div>
           <div className="flex items-center gap-2">
-            <img src="/icons/icon.svg" alt="Probattio" className="h-9 w-9 rounded-xl border border-slate-200" />
-            <span className="text-lg font-bold text-slate-900">Probattio</span>
+            <img src="/logo-wordmark.png" alt="Probattio" className="h-6 w-auto" />
           </div>
           {(professional || stepText) && (
             <p className="mt-1 text-xs text-slate-500">

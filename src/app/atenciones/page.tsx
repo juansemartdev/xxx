@@ -94,7 +94,7 @@ export default function Atenciones() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header stepIndex={3} stepLabel="Medicamentos" />
+      <Header stepIndex={2} stepLabel="Medicamentos" />
       <main className="mx-auto max-w-xl px-4 pb-8">
         <div className="py-4">
           <h1 className="text-2xl font-bold text-slate-900">Medicamentos pendientes</h1>

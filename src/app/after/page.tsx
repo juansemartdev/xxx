@@ -99,7 +99,7 @@ export default function After() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header stepIndex={6} stepLabel="Evidencia después" />
+      <Header stepIndex={5} stepLabel="Evidencia después" />
       <main className="mx-auto max-w-xl px-4 pb-8">
         <div className="py-4">
           <h1 className="text-2xl font-bold text-slate-900">Registrar vial después</h1>

@@ -111,7 +111,7 @@ export default function VerificarPaciente() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header stepIndex={2} stepSuffix="b" stepLabel="Verificación" />
+      <Header stepIndex={1} stepSuffix="b" stepLabel="Verificación" />
       <main className="mx-auto max-w-xl px-4 pb-8">
         <div className="py-4">
           <h1 className="text-2xl font-bold text-slate-900">Confirmar identidad del paciente</h1>

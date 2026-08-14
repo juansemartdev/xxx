@@ -113,14 +113,10 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header stepIndex={1} stepLabel="Profesional" />
+      <Header />
       <main className="mx-auto max-w-xl px-4 pb-8">
         <div className="text-center py-5">
-          <img
-            src="/icons/icon.svg"
-            alt="Probattio"
-            className="mx-auto h-14 w-14 rounded-2xl border border-slate-200"
-          />
+          <img src="/logo-wordmark.png" alt="Probattio" className="mx-auto h-8 w-auto" />
           <h1 className="mt-4 text-2xl font-bold text-slate-900">Entrar a Probattio</h1>
           <p className="mt-2 text-sm text-slate-500">
             Verificación biométrica con prueba de vida (Face Liveness) y comparación facial, provista por AWS

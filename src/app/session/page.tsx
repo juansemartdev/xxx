@@ -138,7 +138,7 @@ export default function Session() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header stepIndex={2} stepLabel="Paciente" />
+      <Header stepIndex={1} stepLabel="Paciente" />
       <main className="mx-auto max-w-xl px-4 pb-8">
         {mode === 'confirm' && (
           <>
