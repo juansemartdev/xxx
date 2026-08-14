@@ -1,10 +1,18 @@
 'use client';
 import {useEffect, useState} from 'react';
 import Link from 'next/link';
-import Header from '@/components/Header';
 import {getSession, startNewEncounter, startNextMedication, updateSession, Session} from '@/lib/session';
 import {appendHistory, deviationFromHistory} from '@/lib/history';
 import {useRequireProfessional} from '@/lib/useRequireProfessional';
+
+function Metric({label, value}: {label: string; value: string}) {
+  return (
+    <div className="flex justify-between py-3">
+      <span className="text-sm text-slate-500">{label}</span>
+      <span className="text-sm font-semibold">{value}</span>
+    </div>
+  );
+}
 
 export default function Complete() {
   useRequireProfessional();
@@ -154,143 +162,111 @@ export default function Complete() {
     }
   }, []);
 
-  const diff =
-    s.beforeWeight != null && s.afterWeight != null
-      ? (s.beforeWeight - s.afterWeight).toFixed(3)
-      : '—';
+  const diff = s.beforeWeight != null && s.afterWeight != null ? (s.beforeWeight - s.afterWeight).toFixed(3) : '—';
   const needsAudit = auditReasons.length > 0;
 
   return (
-    <>
-      <Header step="Sesión completada" />
-      <div className="content space-y-5">
-        <div className="card">
-          <div className="step">7 · Registro cerrado</div>
-          <h1 className="text-3xl font-extrabold mt-2">✓ Sesión completa</h1>
-          <div className="status text-green-700 bg-green-50 mt-4">
-            <span className="dot" />
-            Evidencia registrada
+    <div className="min-h-screen bg-slate-50">
+      <main className="mx-auto max-w-xl px-4 pb-8">
+        <div className="py-6 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl font-bold text-green-700">
+            ✓
           </div>
-        </div>
-        <div className="card">
-          <div className="metric">
-            <span>Paciente</span>
-            <b>{s.patient || '—'}</b>
-          </div>
-          {s.atencionProduct && (
-            <div className="metric">
-              <span>Atención (prescrito)</span>
-              <b>
-                {s.atencionProduct}
-                {s.atencionLot ? ` · Lote ${s.atencionLot}` : ''}
-              </b>
-            </div>
-          )}
-          <div className="metric">
-            <span>Tag NFC</span>
-            <b>{s.tagId || '—'}</b>
-          </div>
-          <div className="metric">
-            <span>Producto</span>
-            <b>{s.beforeProduct || s.afterProduct || '—'}</b>
-          </div>
-          <div className="metric">
-            <span>GTIN</span>
-            <b>{s.beforeGtin || s.afterGtin || '—'}</b>
-          </div>
-          <div className="metric">
-            <span>Lote (antes)</span>
-            <b>{s.beforeLot || '—'}</b>
-          </div>
-          <div className="metric">
-            <span>Lote (después)</span>
-            <b>{s.afterLot || '—'}</b>
-          </div>
-          <div className="metric">
-            <span>Vencimiento (antes)</span>
-            <b>{s.beforeExpiry || '—'}</b>
-          </div>
-          <div className="metric">
-            <span>Vencimiento (después)</span>
-            <b>{s.afterExpiry || '—'}</b>
-          </div>
-          <div className="metric">
-            <span>Peso ANTES</span>
-            <b>{s.beforeWeight ?? '—'} g</b>
-          </div>
-          <div className="metric">
-            <span>Peso DESPUÉS</span>
-            <b>{s.afterWeight ?? '—'} g</b>
-          </div>
-          <div className="metric">
-            <span>Diferencia de masa</span>
-            <b>{diff} g</b>
-          </div>
-          <div className="metric">
-            <span>Verificación de identidad del paciente</span>
-            <b>
-              {s.patientVerified === true
-                ? '✓ Confirmada'
-                : s.patientVerified === false
-                ? '✗ No confirmada'
-                : '— No realizada'}
-            </b>
-          </div>
+          <h1 className="mt-4 text-2xl font-bold text-slate-900">Sesión completa</h1>
+          <p className="mt-1 text-sm text-slate-500">La evidencia quedó registrada correctamente.</p>
         </div>
 
-        <div className={`card ${needsAudit ? 'border-red-300' : ''}`}>
-          <div className="step">Auditoría</div>
-          {needsAudit ? (
-            <>
-              <div className="status text-red-700 bg-red-50 mt-2">
-                <span className="dot" />
-                Esta sesión debe enviarse a auditoría
+        <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <h2 className="font-bold text-slate-900">Resumen de la administración</h2>
+          <div className="mt-2 divide-y divide-slate-100">
+            <Metric label="Paciente" value={s.patient || '—'} />
+            {s.atencionProduct && (
+              <Metric
+                label="Atención prescrita"
+                value={s.atencionProduct + (s.atencionLot ? ` · Lote ${s.atencionLot}` : '')}
+              />
+            )}
+            <Metric label="Tag NFC" value={s.tagId || '—'} />
+            <Metric label="Producto" value={s.beforeProduct || s.afterProduct || '—'} />
+            <Metric label="GTIN" value={s.beforeGtin || s.afterGtin || '—'} />
+            <Metric label="Lote antes / después" value={`${s.beforeLot || '—'} / ${s.afterLot || '—'}`} />
+            <Metric label="Vencimiento antes / después" value={`${s.beforeExpiry || '—'} / ${s.afterExpiry || '—'}`} />
+            <Metric label="Peso antes" value={s.beforeWeight != null ? `${s.beforeWeight} g` : '—'} />
+            <Metric label="Peso después" value={s.afterWeight != null ? `${s.afterWeight} g` : '—'} />
+            <div className="flex justify-between py-3">
+              <span className="text-sm text-slate-500">Diferencia de masa</span>
+              <span className="text-sm font-bold text-teal-700">{diff} g</span>
+            </div>
+            <Metric
+              label="Verificación de identidad"
+              value={s.patientVerified === true ? '✓ Confirmada' : s.patientVerified === false ? '✗ No confirmada' : '— No realizada'}
+            />
+          </div>
+        </section>
+
+        {needsAudit ? (
+          <section className="mt-4 rounded-2xl border-2 border-red-400 bg-red-50 p-5 shadow-sm">
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-100 text-xl font-bold text-red-700">
+                !
               </div>
-              <ul className="mt-3 space-y-2 text-sm text-slate-700 list-disc pl-5">
+              <div>
+                <h2 className="text-lg font-bold text-red-950">Esta sesión debe enviarse a auditoría</h2>
+                <p className="mt-1 text-sm text-red-900">Se detectaron condiciones que requieren revisión.</p>
+              </div>
+            </div>
+            <div className="mt-4 rounded-xl bg-white/70 p-3">
+              <p className="text-sm font-semibold text-red-950">Motivos detectados</p>
+              <ul className="mt-2 space-y-2 text-sm text-red-900">
                 {auditReasons.map((reason, i) => (
-                  <li key={i}>{reason}</li>
+                  <li key={i}>• {reason}</li>
                 ))}
               </ul>
-            </>
-          ) : (
-            <div className="status text-green-700 bg-green-50 mt-2">
-              <span className="dot" />
-              No requiere auditoría
             </div>
-          )}
-        </div>
+          </section>
+        ) : (
+          <section className="mt-4 rounded-2xl border-2 border-green-200 bg-green-50 p-5">
+            <h2 className="font-bold text-green-950">No requiere auditoría</h2>
+            <p className="mt-1 text-sm text-green-900">Los controles de identidad, vial y peso no generaron alertas.</p>
+          </section>
+        )}
 
-        {s.patientDocNumber && (
+        <div className="mt-6 space-y-3">
+          {s.patientDocNumber && (
+            <button
+              className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
+              onClick={() => {
+                // Mantiene al paciente ya identificado/verificado (y al
+                // profesional) — para el siguiente medicamento pendiente de
+                // este mismo paciente no hace falta repetir la verificación
+                // biométrica.
+                startNextMedication();
+                location.href = '/atenciones';
+              }}
+            >
+              Siguiente medicamento de este paciente
+            </button>
+          )}
           <button
-            className="btn primary"
+            className="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-700 active:scale-[0.98]"
             onClick={() => {
-              // Mantiene al paciente ya identificado/verificado (y al
-              // profesional) — para el siguiente medicamento pendiente de
-              // este mismo paciente no hace falta repetir la verificación
-              // biométrica.
-              startNextMedication();
-              location.href = '/atenciones';
+              // Mantiene al profesional logueado — solo limpia el paciente y
+              // los datos de esta dosis, para poder seguir atendiendo sin
+              // volver a pasar por Face Liveness.
+              startNewEncounter();
+              location.href = '/session';
             }}
           >
-            Siguiente medicamento de este paciente
+            Atender otro paciente
           </button>
-        )}
-        <button
-          className="btn secondary"
-          onClick={() => {
-            // Mantiene al profesional logueado — limpia el paciente y los
-            // datos de esta dosis, para atender a alguien distinto sin
-            // volver a pasar por Face Liveness del profesional.
-            startNewEncounter();
-            location.href = '/session';
-          }}
-        >
-          Atender otro paciente
-        </button>
-        <Link href="/session" className="btn secondary block text-center">
-          Volver al inicio (sigues logueado)
-        </Link>
-      </div>
-    </>
+          <Link
+            href="/session"
+            className="block min-h-12 w-full rounded-xl border border-slate-300 bg-white px-5 py-3 text-center font-semibold text-slate-700 active:scale-[0.98]"
+          >
+            Volver al inicio (sigues logueado)
+          </Link>
+        </div>
+      </main>
+    </div>
   );
 }

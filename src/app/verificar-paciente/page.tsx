@@ -16,9 +16,10 @@ export default function VerificarPaciente() {
   const [done, setDone] = useState(false);
   const [ok, setOk] = useState(false);
   const [notes, setNotes] = useState('');
+  const [similarity, setSimilarity] = useState<number | null>(null);
 
-  // Preferimos la foto EN VIVO capturada en /registro (más confiable,
-  // ver session.ts) y caemos a la foto de la cédula si no existe (pacientes
+  // Preferimos la foto EN VIVO capturada en /registro (más confiable, ver
+  // session.ts) y caemos a la foto de la cédula si no existe (pacientes
   // registrados antes de este cambio, o que omitieron ese paso).
   const referenceImage = session.patientReferencePhoto || session.patientIdPhoto;
   const hasIdPhoto = !!referenceImage;
@@ -66,19 +67,21 @@ export default function VerificarPaciente() {
       if (!res.ok) throw new Error(json.error || 'No se pudo comparar el rostro con la cédula.');
 
       const verified = !!json.matched;
+      const sim = Math.round(json.similarity ?? 0);
       updateSession({
         patientVerified: verified,
         patientLivenessConfidence: result.confidence,
         patientFaceMatchSimilarity: json.similarity ?? 0,
         patientVerificationNotes: verified
           ? 'Prueba de vida y coincidencia facial confirmadas.'
-          : `El rostro capturado no coincide con la foto de referencia (similitud ${Math.round(json.similarity ?? 0)}%).`,
+          : `El rostro capturado no coincide con la foto de referencia (similitud ${sim}%).`,
       });
       setOk(verified);
+      setSimilarity(sim);
       setNotes(
         verified
-          ? `Coincide con la foto de referencia (similitud ${Math.round(json.similarity ?? 0)}%).`
-          : `No coincide con la foto de referencia (similitud ${Math.round(json.similarity ?? 0)}%).`
+          ? `Coincide con la foto de referencia (similitud ${sim}%).`
+          : `No coincide con la foto de referencia (similitud ${sim}%).`
       );
       setDone(true);
     } catch (e) {
@@ -94,64 +97,102 @@ export default function VerificarPaciente() {
 
   if (started) {
     return (
-      <>
-        <Header step="Verificación del paciente" />
-        <div className="content space-y-5">
-          <div className="card">
-            <div className="step">2b · Paciente</div>
-            <h1 className="text-2xl font-bold mt-2">Verificando identidad</h1>
-            <p className="sub">Mira a la cámara y sigue las instrucciones en pantalla.</p>
+      <div className="min-h-screen bg-slate-50">
+        <Header stepIndex={2} stepSuffix="b" stepLabel="Verificación" />
+        <main className="mx-auto max-w-xl px-4 pb-8">
+          <div className="py-5">
+            <p className="text-sm font-semibold text-teal-700">Paso 2b de 7 · Verificación</p>
+            <h1 className="mt-1 text-2xl font-bold text-slate-900">Verificando identidad</h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Mantén el rostro dentro del marco y sigue las instrucciones en pantalla.
+            </p>
           </div>
           <LivenessCheck onComplete={onComplete} onCancel={() => setStarted(false)} />
-        </div>
-      </>
+        </main>
+      </div>
     );
   }
 
   return (
-    <>
-      <Header step="Verificación del paciente" />
-      <div className="content space-y-5">
-        <div className="card">
-          <div className="step">2b · Paciente</div>
-          <h1 className="text-2xl font-bold mt-2">Confirmar identidad del paciente</h1>
-          <p className="sub">
-            {hasIdPhoto
-              ? 'Vamos a confirmar que la persona presente es real (prueba de vida) y que coincide con su foto de referencia.'
-              : 'Este paciente no tiene una foto de referencia registrada, así que solo confirmaremos prueba de vida.'}
-          </p>
-
-          {error && <p className="text-sm text-red-700 bg-red-50 rounded-md p-2 mt-3">{error}</p>}
-
-          {done && (
-            <p
-              className={`text-sm rounded-md p-2 mt-3 ${
-                ok ? 'text-green-700 bg-green-50' : 'text-red-700 bg-red-50'
-              }`}
-            >
-              {notes}
-            </p>
-          )}
+    <div className="min-h-screen bg-slate-50">
+      <Header stepIndex={2} stepSuffix="b" stepLabel="Verificación" />
+      <main className="mx-auto max-w-xl px-4 pb-8">
+        <div className="py-5">
+          <p className="text-sm font-semibold text-teal-700">Paso 2b de 7 · Verificación</p>
+          <h1 className="mt-1 text-2xl font-bold text-slate-900">Confirmar identidad del paciente</h1>
         </div>
 
         {!done && (
-          <button className="btn primary disabled:opacity-40" onClick={() => setStarted(true)} disabled={busy}>
-            Iniciar verificación
-          </button>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 text-2xl text-teal-700">
+              ◉
+            </div>
+            <h2 className="mt-4 text-center text-lg font-bold text-slate-900">Prueba de vida + comparación facial</h2>
+            <p className="mt-2 text-center text-sm leading-6 text-slate-500">
+              {hasIdPhoto
+                ? 'Vamos a confirmar que la persona presente es real (prueba de vida) y que coincide con su foto de referencia.'
+                : 'Este paciente no tiene una foto de referencia registrada, así que solo confirmaremos prueba de vida.'}
+            </p>
+
+            {!hasIdPhoto && (
+              <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+                Solo se validará prueba de vida — no hay foto de referencia con qué comparar.
+              </div>
+            )}
+
+            {error && <p className="mt-3 rounded-xl bg-red-50 p-2 text-sm text-red-700">{error}</p>}
+
+            <button
+              className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-70 active:scale-[0.98]"
+              onClick={() => setStarted(true)}
+              disabled={busy}
+            >
+              {busy && <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
+              Iniciar verificación
+            </button>
+          </div>
         )}
-        {done && (
+
+        {done && ok && (
           <>
-            <button className="btn primary" onClick={continuar}>
+            <div className="flex gap-3 rounded-2xl border border-green-200 bg-green-50 p-4">
+              <span className="font-bold text-green-700">✓</span>
+              <div>
+                <p className="font-semibold text-green-950">Identidad confirmada</p>
+                <p className="mt-1 text-sm text-green-800">
+                  {similarity != null ? `Similitud: ${similarity}%` : notes}
+                </p>
+              </div>
+            </div>
+            <button
+              className="mt-6 min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
+              onClick={continuar}
+            >
               Ver medicamentos pendientes
             </button>
-            {!ok && (
-              <button className="btn secondary" onClick={() => setDone(false)}>
-                Intentar de nuevo
-              </button>
-            )}
           </>
         )}
-      </div>
-    </>
+
+        {done && !ok && (
+          <>
+            <div className="flex gap-3 rounded-2xl border-2 border-red-300 bg-red-50 p-5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 font-bold text-red-700">
+                !
+              </div>
+              <div>
+                <p className="font-bold text-red-950">No se pudo confirmar</p>
+                <p className="mt-1 text-sm text-red-900">{notes}</p>
+              </div>
+            </div>
+            <button
+              className="mt-6 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-700 active:scale-[0.98]"
+              onClick={() => setDone(false)}
+            >
+              Intentar de nuevo
+            </button>
+          </>
+        )}
+      </main>
+    </div>
   );
 }

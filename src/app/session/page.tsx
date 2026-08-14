@@ -137,64 +137,104 @@ export default function Session() {
   }
 
   return (
-    <>
-      <Header step="Nueva administración" />
-      <div className="content space-y-5">
+    <div className="min-h-screen bg-slate-50">
+      <Header stepIndex={2} stepLabel="Paciente" />
+      <main className="mx-auto max-w-xl px-4 pb-8">
         {mode === 'confirm' && (
           <>
-            <div className="card">
-              <div className="step">2 · Paciente</div>
-              <h1 className="text-2xl font-bold mt-2">¿Es este el paciente?</h1>
-              <p className="sub">Confirma la identidad antes de continuar — esto evita administrar la dosis a la persona equivocada.</p>
-              <div className="status text-green-700 bg-green-50 mt-4">
-                <span className="dot" />
-                {session.patient}
-              </div>
+            <div className="py-5">
+              <p className="text-sm font-semibold text-teal-700">Paso 2 de 7 · Paciente</p>
+              <h1 className="mt-1 text-2xl font-bold text-slate-900">Confirma el paciente</h1>
+              <p className="mt-2 text-sm text-slate-500">
+                Verifica que la persona frente a ti corresponda al registro — esto evita administrar la dosis a la
+                persona equivocada.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-green-200 bg-green-50 p-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Paciente identificado</p>
+              <h2 className="mt-1 text-xl font-bold text-slate-900">{session.patient}</h2>
               {session.patientDocNumber && (
-                <p className="text-sm text-slate-500 mt-2">Documento: {session.patientDocNumber}</p>
+                <p className="mt-1 text-sm text-slate-600">CC {session.patientDocNumber}</p>
               )}
             </div>
-            <button className="btn primary" onClick={goVerify}>
-              Sí, es este paciente — continuar
-            </button>
-            <button className="btn secondary" onClick={noEsEste}>
-              No es este paciente / buscar otro
-            </button>
+
+            <div className="mt-6 space-y-3">
+              <button
+                className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm active:scale-[0.98]"
+                onClick={goVerify}
+              >
+                Sí, es este paciente — continuar
+              </button>
+              <button
+                className="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-700 active:scale-[0.98]"
+                onClick={noEsEste}
+              >
+                No es este paciente / buscar otro
+              </button>
+            </div>
           </>
         )}
 
         {(mode === 'search' || mode === 'notfound') && (
           <>
-            <div className="card space-y-3">
-              <div className="step">2 · Paciente</div>
-              <h1 className="text-2xl font-bold mt-2">Identificar paciente</h1>
-              <p className="sub">Busca al paciente por su número de documento (debe estar registrado previamente por cédula).</p>
-              <input
-                value={documentInput}
-                onChange={(e) => setDocumentInput(e.target.value)}
-                placeholder="Número de documento"
-                inputMode="numeric"
-                className="w-full rounded-xl border border-slate-200 p-3"
-              />
-              {searchError && <p className="text-sm text-red-700 bg-red-50 rounded-md p-2">{searchError}</p>}
+            <div className="py-5">
+              <p className="text-sm font-semibold text-teal-700">Paso 2 de 7 · Paciente</p>
+              <h1 className="mt-1 text-2xl font-bold text-slate-900">Identificar paciente</h1>
+              <p className="mt-2 text-sm text-slate-500">
+                Busca por número de documento (debe estar registrado previamente por cédula).
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-slate-700">Número de documento</span>
+                <input
+                  value={documentInput}
+                  onChange={(e) => setDocumentInput(e.target.value)}
+                  placeholder="Ej. 1030123456"
+                  inputMode="numeric"
+                  className="min-h-12 w-full rounded-xl border border-slate-300 px-4 text-lg outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                />
+              </label>
+
+              {searchError && <p className="mt-3 rounded-xl bg-red-50 p-2 text-sm text-red-700">{searchError}</p>}
               {mode === 'notfound' && (
-                <p className="text-sm text-amber-700 bg-amber-50 rounded-md p-2">
+                <p className="mt-3 rounded-xl bg-amber-50 p-2 text-sm text-amber-700">
                   No se encontró un paciente con ese documento. Regístralo primero escaneando su cédula.
                 </p>
               )}
+
+              <button
+                className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-70 active:scale-[0.98]"
+                onClick={buscar}
+                disabled={searching}
+              >
+                {searching && (
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                )}
+                {searching ? 'Buscando…' : 'Buscar paciente'}
+              </button>
+
+              <div className="my-5 flex items-center gap-3">
+                <div className="h-px flex-1 bg-slate-200" />
+                <span className="text-xs text-slate-400">o</span>
+                <div className="h-px flex-1 bg-slate-200" />
+              </div>
+
+              <a
+                href="/registro"
+                className="flex min-h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-5 text-center font-semibold text-slate-700 active:scale-[0.98]"
+              >
+                Registrar nuevo paciente · escanear cédula
+              </a>
+              <button className="mt-3 w-full py-3 text-sm text-slate-500" onClick={usarPacientePrueba}>
+                Usar paciente de prueba (solo demo/V1)
+              </button>
             </div>
-            <button className="btn primary disabled:opacity-40" onClick={buscar} disabled={searching}>
-              {searching ? 'Buscando…' : 'Buscar paciente'}
-            </button>
-            <a href="/registro" className="btn secondary block text-center">
-              Registrar nuevo paciente (escanear cédula)
-            </a>
-            <button className="btn secondary" onClick={usarPacientePrueba}>
-              Usar paciente de prueba (solo demo/V1)
-            </button>
           </>
         )}
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

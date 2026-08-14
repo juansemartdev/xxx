@@ -12,6 +12,31 @@ import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
 type Step = 'frente' | 'reverso' | 'form' | 'foto-viva';
 
+function Field({
+  value,
+  onChange,
+  placeholder,
+  inputMode,
+  maxLength,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  inputMode?: 'numeric' | 'text';
+  maxLength?: number;
+}) {
+  return (
+    <input
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      inputMode={inputMode}
+      maxLength={maxLength}
+      className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+    />
+  );
+}
+
 export default function Registro() {
   useRequireProfessional();
   const r = useRouter();
@@ -182,149 +207,135 @@ export default function Registro() {
   }
 
   return (
-    <>
-      <Header step="Registro por cédula" />
-      <div className="content space-y-5">
-        <div className="card">
-          <div className="step">Registro</div>
-          <h1 className="text-2xl font-bold mt-2">Escanear cédula</h1>
-          <p className="sub">
+    <div className="min-h-screen bg-slate-50">
+      <Header stepIndex={2} stepLabel="Registro" />
+      <main className="mx-auto max-w-xl px-4 pb-8">
+        <div className="py-5">
+          <p className="text-sm font-semibold text-teal-700">Paso 2 de 7 · Registro</p>
+          <h1 className="mt-1 text-2xl font-bold text-slate-900">Escanear cédula</h1>
+          <p className="mt-2 text-sm text-slate-500">
             Funciona con la cédula amarilla (laminada) y la cédula digital azul. Primero el frente, luego el
             reverso.
           </p>
         </div>
 
         {step === 'frente' && (
-          <div className="card space-y-3">
-            <label className="font-semibold">1 · Frente de la cédula</label>
-            <CameraCapture onCapture={onFront} />
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <label className="mb-3 block text-sm font-semibold text-slate-700">1 · Frente de la cédula</label>
+            <CameraCapture onCapture={onFront} guideText="Frente de la cédula" aspect="retrato" />
           </div>
         )}
 
         {step === 'reverso' && (
-          <div className="card space-y-3">
-            <label className="font-semibold">2 · Reverso de la cédula</label>
-            <p className="text-xs text-slate-500">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <label className="mb-1 block text-sm font-semibold text-slate-700">2 · Reverso de la cédula</label>
+            <p className="mb-3 text-xs text-slate-500">
               En la cédula amarilla, el reverso trae el código de barras — inclúyelo bien enfocado en la foto.
             </p>
-            <CameraCapture onCapture={onBack} />
+            <CameraCapture onCapture={onBack} guideText="Reverso de la cédula, con el código de barras visible" aspect="retrato" />
           </div>
         )}
 
         {step === 'form' && (
-          <>
-            {processing && <p className="text-sm text-slate-500">Leyendo datos de la cédula…</p>}
-            {sourceMsg && <p className="text-sm text-amber-600">{sourceMsg}</p>}
+          <div className="space-y-4">
+            {processing && (
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-teal-700" />
+                Leyendo datos de la cédula…
+              </div>
+            )}
+            {sourceMsg && <p className="rounded-xl bg-amber-50 p-2 text-sm text-amber-700">{sourceMsg}</p>}
             {rawBarcode && (
-              <p className="text-xs text-slate-400 break-all">
+              <p className="break-all text-xs text-slate-400">
                 Contenido crudo del código de barras: <span className="font-mono">{rawBarcode}</span>
               </p>
             )}
 
-            <div className="card space-y-2">
-              <label className="font-semibold">Datos de la persona</label>
-              <input
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Primer nombre"
-                className="w-full rounded-xl border border-slate-200 p-3"
-              />
-              <input
-                value={middleName}
-                onChange={(e) => setMiddleName(e.target.value)}
-                placeholder="Segundo nombre"
-                className="w-full rounded-xl border border-slate-200 p-3"
-              />
-              <input
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Primer apellido"
-                className="w-full rounded-xl border border-slate-200 p-3"
-              />
-              <input
-                value={secondLastName}
-                onChange={(e) => setSecondLastName(e.target.value)}
-                placeholder="Segundo apellido"
-                className="w-full rounded-xl border border-slate-200 p-3"
-              />
-              <input
-                value={documentNumber}
-                onChange={(e) => setDocumentNumber(e.target.value)}
-                placeholder="Número de cédula"
-                inputMode="numeric"
-                className="w-full rounded-xl border border-slate-200 p-3"
-              />
-              <input
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                placeholder="Fecha de nacimiento (AAAA-MM-DD)"
-                className="w-full rounded-xl border border-slate-200 p-3"
-              />
-              <input
-                value={bloodType}
-                onChange={(e) => setBloodType(e.target.value)}
-                placeholder="Tipo de sangre (Ej. O+)"
-                className="w-full rounded-xl border border-slate-200 p-3"
-              />
-              <input
+            <div className="space-y-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <label className="mb-1 block text-sm font-semibold text-slate-700">Datos de la persona</label>
+              <Field value={firstName} onChange={setFirstName} placeholder="Primer nombre" />
+              <Field value={middleName} onChange={setMiddleName} placeholder="Segundo nombre" />
+              <Field value={lastName} onChange={setLastName} placeholder="Primer apellido" />
+              <Field value={secondLastName} onChange={setSecondLastName} placeholder="Segundo apellido" />
+              <Field value={documentNumber} onChange={setDocumentNumber} placeholder="Número de cédula" inputMode="numeric" />
+              <Field value={birthDate} onChange={setBirthDate} placeholder="Fecha de nacimiento (AAAA-MM-DD)" />
+              <Field value={bloodType} onChange={setBloodType} placeholder="Tipo de sangre (Ej. O+)" />
+              <Field
                 value={gender}
-                onChange={(e) => setGender(e.target.value.toUpperCase())}
+                onChange={(v) => setGender(v.toUpperCase())}
                 placeholder="Sexo (M/F)"
                 maxLength={1}
-                className="w-full rounded-xl border border-slate-200 p-3"
               />
             </div>
 
             <button
               disabled={!firstName || !lastName}
-              className="btn primary disabled:opacity-40"
+              className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
               onClick={() => setStep('foto-viva')}
             >
               Continuar
             </button>
-          </>
+          </div>
         )}
 
         {step === 'foto-viva' && !livenessStarted && (
-          <>
-            <div className="card">
-              <label className="font-semibold">3 · Foto de referencia (en vivo)</label>
-              <p className="sub mt-2">
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 text-2xl text-teal-700">
+                ◉
+              </div>
+              <h2 className="mt-4 text-center text-lg font-bold text-slate-900">Foto de referencia (en vivo)</h2>
+              <p className="mt-2 text-center text-sm leading-6 text-slate-500">
                 La foto de la cédula puede ser de hace varios años. Tomamos una foto en vivo del paciente ahora
                 mismo (misma prueba de vida que usa el profesional al ingresar) para que las verificaciones
                 futuras comparen contra una imagen reciente y confiable.
               </p>
+
+              {livenessError && (
+                <p className="mt-3 rounded-xl bg-red-50 p-2 text-sm text-red-700">{livenessError}</p>
+              )}
+              {saveError && <p className="mt-3 rounded-xl bg-red-50 p-2 text-sm text-red-700">{saveError}</p>}
+
+              <div className="mt-6 space-y-3">
+                <button
+                  className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
+                  onClick={() => setLivenessStarted(true)}
+                  disabled={saving}
+                >
+                  Iniciar captura
+                </button>
+                <button
+                  className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-700 disabled:opacity-40 active:scale-[0.98]"
+                  onClick={() => guardar()}
+                  disabled={saving}
+                >
+                  {saving && (
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-teal-700" />
+                  )}
+                  {saving ? 'Guardando…' : 'Omitir (usar solo foto de la cédula)'}
+                </button>
+                {saveError && (
+                  <button
+                    className="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-700 active:scale-[0.98]"
+                    onClick={() => r.push('/')}
+                  >
+                    Continuar de todas formas (ya quedó guardado en este dispositivo)
+                  </button>
+                )}
+              </div>
             </div>
-
-            {livenessError && (
-              <p className="text-sm text-red-700 bg-red-50 rounded-md p-2">{livenessError}</p>
-            )}
-            {saveError && (
-              <p className="text-sm text-red-700 bg-red-50 rounded-md p-2">{saveError}</p>
-            )}
-
-            <button
-              className="btn primary disabled:opacity-40"
-              onClick={() => setLivenessStarted(true)}
-              disabled={saving}
-            >
-              Iniciar captura
-            </button>
-            <button className="btn secondary disabled:opacity-40" onClick={() => guardar()} disabled={saving}>
-              {saving ? 'Guardando…' : 'Omitir (usar solo foto de la cédula)'}
-            </button>
-            {saveError && (
-              <button className="btn secondary" onClick={() => r.push('/')}>
-                Continuar de todas formas (ya quedó guardado en este dispositivo)
-              </button>
-            )}
-          </>
+          </div>
         )}
 
         {step === 'foto-viva' && livenessStarted && (
-          <LivenessCheck onComplete={onLivenessComplete} onCancel={() => setLivenessStarted(false)} />
+          <div className="space-y-4">
+            <div className="py-2">
+              <p className="text-sm text-slate-500">Mira a la cámara y sigue las instrucciones en pantalla.</p>
+            </div>
+            <LivenessCheck onComplete={onLivenessComplete} onCancel={() => setLivenessStarted(false)} />
+          </div>
         )}
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

@@ -93,62 +93,121 @@ export default function Atenciones() {
   const totalMedicamentos = atenciones.reduce((n, a) => n + a.medications.length, 0);
 
   return (
-    <>
-      <Header step="Medicamentos pendientes" />
-      <div className="content space-y-5">
-        <div className="card">
-          <div className="step">3 · Atenciones</div>
-          <h1 className="text-2xl font-bold mt-2">Medicamentos pendientes</h1>
-          <p className="sub">
+    <div className="min-h-screen bg-slate-50">
+      <Header stepIndex={3} stepLabel="Medicamentos" />
+      <main className="mx-auto max-w-xl px-4 pb-8">
+        <div className="py-5">
+          <p className="text-sm font-semibold text-teal-700">Paso 3 de 7 · Medicamentos</p>
+          <h1 className="mt-1 text-2xl font-bold text-slate-900">Medicamentos pendientes</h1>
+          <p className="mt-2 text-sm text-slate-500">
             {documentNumber
               ? 'Elige el medicamento que vas a administrar en esta sesión.'
               : 'Este paciente no tiene documento registrado, así que no se pueden buscar atenciones.'}
           </p>
         </div>
 
-        {loading && <p className="text-sm text-slate-500">Cargando…</p>}
-        {error && <p className="text-sm text-red-700 bg-red-50 rounded-md p-2">{error}</p>}
-
-        {!loading && documentNumber && totalMedicamentos === 0 && !error && (
-          <div className="card">
-            <p className="sub">Este paciente no tiene atenciones pendientes en este momento.</p>
+        {loading && (
+          <div className="space-y-3">
+            {[0, 1].map((i) => (
+              <div key={i} className="animate-pulse rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="h-4 w-2/3 rounded bg-slate-200" />
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <div className="h-3 w-full rounded bg-slate-100" />
+                  <div className="h-3 w-full rounded bg-slate-100" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        {!loading &&
-          atenciones.map((a) => (
-            <div key={a.id} className="space-y-2">
-              {a.externalReference && (
-                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                  Atención {a.externalReference}
-                  {a.medications.length > 1 && ` · ${a.medications.length} medicamentos`}
-                </div>
-              )}
-              {a.medications.map((m) => (
-                <button key={m.id} className="card text-left w-full" onClick={() => elegir(a, m)}>
-                  <div className="font-semibold">{m.product}</div>
-                  <div className="text-sm text-slate-500 mt-1">
-                    {m.lot && <>Lote: {m.lot} · </>}
-                    {m.expiry && <>Vence: {m.expiry}</>}
-                  </div>
-                  {m.notes && <div className="text-sm text-slate-500 mt-1">{m.notes}</div>}
-                </button>
-              ))}
+        {error && (
+          <div className="flex gap-3 rounded-2xl border-2 border-red-300 bg-red-50 p-5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 font-bold text-red-700">
+              !
             </div>
-          ))}
+            <div className="flex-1">
+              <p className="font-bold text-red-950">No se pudieron cargar las atenciones</p>
+              <p className="mt-1 text-sm text-red-900">{error}</p>
+              {documentNumber && (
+                <button
+                  className="mt-3 min-h-10 rounded-lg border border-red-300 bg-white px-4 text-sm font-semibold text-red-700"
+                  onClick={() => cargar(documentNumber)}
+                >
+                  Reintentar
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {!loading && documentNumber && totalMedicamentos === 0 && !error && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+            <p className="text-sm text-slate-500">Este paciente no tiene atenciones pendientes en este momento.</p>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <div className="space-y-4">
+            {atenciones.map((a) => (
+              <div key={a.id} className="space-y-2">
+                {a.externalReference && (
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    Atención {a.externalReference}
+                    {a.medications.length > 1 && ` · ${a.medications.length} medicamentos`}
+                  </p>
+                )}
+                <div className="space-y-3">
+                  {a.medications.map((m) => (
+                    <button
+                      key={m.id}
+                      className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm active:scale-[0.99]"
+                      onClick={() => elegir(a, m)}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-bold text-slate-900">{m.product}</p>
+                          {m.gtin && <p className="mt-1 text-sm text-slate-500">GTIN {m.gtin}</p>}
+                        </div>
+                        <span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
+                          Pendiente
+                        </span>
+                      </div>
+                      {(m.lot || m.expiry) && (
+                        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <span className="text-slate-500">Lote</span>
+                            <p className="font-semibold">{m.lot || '—'}</p>
+                          </div>
+                          <div>
+                            <span className="text-slate-500">Vence</span>
+                            <p className="font-semibold">{m.expiry || '—'}</p>
+                          </div>
+                        </div>
+                      )}
+                      {m.notes && <p className="mt-2 text-sm text-slate-500">{m.notes}</p>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {!loading && documentNumber && (
-          <button className="btn secondary" onClick={() => cargar(documentNumber)}>
+          <button
+            className="mt-5 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-700 active:scale-[0.98]"
+            onClick={() => cargar(documentNumber)}
+          >
             Actualizar lista
           </button>
         )}
 
         {!loading && (
-          <button className="btn secondary" onClick={continuarSinAtencion}>
+          <button className="mt-3 w-full py-3 text-sm text-slate-500" onClick={continuarSinAtencion}>
             Continuar sin atención (modo prueba)
           </button>
         )}
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

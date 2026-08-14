@@ -94,54 +94,47 @@ export default function Login() {
     }
   }
 
-  if (mode === 'register') {
+  if (mode === 'register' || mode === 'authenticate') {
     return (
-      <>
-        <Header step="Acceso profesional" />
-        <div className="content space-y-5">
-          <div className="card">
-            <div className="step">1 · Profesional</div>
-            <h1 className="text-2xl font-bold mt-2">Registrar biométrico</h1>
-            <p className="sub">Mira a la cámara y sigue las instrucciones en pantalla.</p>
+      <div className="min-h-screen bg-slate-50">
+        <Header stepIndex={1} stepLabel="Profesional" />
+        <main className="mx-auto max-w-xl px-4 pb-8">
+          <div className="py-5">
+            <p className="text-sm font-semibold text-teal-700">Paso 1 de 7 · Profesional</p>
+            <h1 className="mt-1 text-2xl font-bold text-slate-900">
+              {mode === 'register' ? 'Registrar biométrico' : 'Verificando identidad'}
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">Mira a la cámara y sigue las instrucciones en pantalla.</p>
           </div>
-          <LivenessCheck onComplete={onRegisterComplete} onCancel={() => setMode('idle')} />
-        </div>
-      </>
-    );
-  }
-
-  if (mode === 'authenticate') {
-    return (
-      <>
-        <Header step="Acceso profesional" />
-        <div className="content space-y-5">
-          <div className="card">
-            <div className="step">1 · Profesional</div>
-            <h1 className="text-2xl font-bold mt-2">Verificando identidad</h1>
-            <p className="sub">Mira a la cámara y sigue las instrucciones en pantalla.</p>
-          </div>
-          <LivenessCheck onComplete={onAuthenticateComplete} onCancel={() => setMode('idle')} />
-        </div>
-      </>
+          <LivenessCheck
+            onComplete={mode === 'register' ? onRegisterComplete : onAuthenticateComplete}
+            onCancel={() => setMode('idle')}
+          />
+        </main>
+      </div>
     );
   }
 
   return (
-    <>
-      <Header step="Acceso profesional" />
-      <div className="content space-y-5">
-        <div className="card">
-          <div className="step">1 · Profesional</div>
-          <h1 className="text-2xl font-bold mt-2">Entrar a ChainDose</h1>
-          <p className="sub">
-            Verificación biométrica con prueba de vida (Face Liveness) y comparación facial, provista
-            por AWS Rekognition.
+    <div className="min-h-screen bg-slate-50">
+      <Header stepIndex={1} stepLabel="Profesional" />
+      <main className="mx-auto max-w-xl px-4 pb-8">
+        <div className="text-center py-5">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-700 font-bold text-white">
+            CD
+          </div>
+          <h1 className="mt-4 text-2xl font-bold text-slate-900">Entrar a ChainDose</h1>
+          <p className="mt-2 text-sm text-slate-500">
+            Verificación biométrica con prueba de vida (Face Liveness) y comparación facial, provista por AWS
+            Rekognition.
           </p>
+        </div>
 
-          <label className="block mt-4">
-            <span className="text-sm text-gray-600">Usuario</span>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-slate-700">Usuario</span>
             <input
-              className="w-full rounded-xl border border-slate-200 p-3 mt-1"
+              className="min-h-12 w-full rounded-xl border border-slate-300 px-4 text-base outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="tu.usuario"
@@ -149,17 +142,27 @@ export default function Login() {
             />
           </label>
 
-          {error && <p className="text-sm text-red-700 bg-red-50 rounded-md p-2 mt-3">{error}</p>}
-          {msg && <p className="text-sm text-green-700 bg-green-50 rounded-md p-2 mt-3">{msg}</p>}
+          {error && <p className="mt-3 rounded-xl bg-red-50 p-2 text-sm text-red-700">{error}</p>}
+          {msg && <p className="mt-3 rounded-xl bg-green-50 p-2 text-sm text-green-700">{msg}</p>}
         </div>
 
-        <button className="btn primary disabled:opacity-40" onClick={startAuthenticate} disabled={busy}>
-          Entrar con biometría
-        </button>
-        <button className="btn secondary disabled:opacity-40" onClick={startRegister} disabled={busy}>
-          Registrar biométrico (primera vez)
-        </button>
-      </div>
-    </>
+        <div className="mt-6 space-y-3">
+          <button
+            className="min-h-12 w-full rounded-xl bg-teal-700 px-5 font-semibold text-white shadow-sm disabled:opacity-40 active:scale-[0.98]"
+            onClick={startAuthenticate}
+            disabled={busy}
+          >
+            Entrar con biometría
+          </button>
+          <button
+            className="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-700 disabled:opacity-40 active:scale-[0.98]"
+            onClick={startRegister}
+            disabled={busy}
+          >
+            Registrar biométrico (primera vez)
+          </button>
+        </div>
+      </main>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 import {useEffect} from 'react';
 import {useRouter} from 'next/navigation';
-import Header from '@/components/Header';
 import {getSession} from '@/lib/session';
 
 // La primera pantalla de la app siempre es el login del profesional: si ya
@@ -16,13 +15,18 @@ export default function Home() {
   }, [r]);
 
   return (
-    <>
-      <Header step="Trazabilidad digital de medicamentos" />
-      <div className="content space-y-5">
-        <div className="card">
-          <p className="sub mt-2">Cargando…</p>
+    <div className="min-h-screen bg-slate-50">
+      <main className="flex min-h-screen flex-col items-center justify-center px-6">
+        <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-teal-700 text-2xl font-bold text-white shadow-lg">
+          CD
         </div>
-      </div>
-    </>
+        <h1 className="mt-5 text-2xl font-bold text-slate-900">ChainDose</h1>
+        <p className="mt-2 text-sm text-slate-500">Trazabilidad digital de medicamentos</p>
+        <div className="mt-8 flex items-center gap-2 text-sm text-slate-500">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-teal-700" />
+          Cargando…
+        </div>
+      </main>
+    </div>
   );
 }

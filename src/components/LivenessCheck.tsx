@@ -74,14 +74,23 @@ export default function LivenessCheck({onComplete, onCancel}: Props) {
     }
   }, [sessionId, onComplete]);
 
-  if (loading) return <p className="sub">Preparando verificación biométrica…</p>;
-  if (error) return <p className="text-sm text-red-700 bg-red-50 rounded-md p-2">{error}</p>;
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-teal-700" />
+        Preparando verificación biométrica…
+      </div>
+    );
+  }
+  if (error) {
+    return <p className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</p>;
+  }
   if (!sessionId) return null;
 
   const region = process.env.NEXT_PUBLIC_AWS_REGION || '';
 
   return (
-    <div className="rounded-2xl overflow-hidden" style={{minHeight: 400}}>
+    <div className="overflow-hidden rounded-3xl bg-slate-950" style={{minHeight: 400}}>
       <FaceLivenessDetectorCore
         sessionId={sessionId}
         region={region}
