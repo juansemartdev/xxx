@@ -72,9 +72,8 @@ export default function Before() {
     <div className="min-h-screen bg-slate-50">
       <Header stepIndex={5} stepLabel="Evidencia antes" />
       <main className="mx-auto max-w-xl px-4 pb-8">
-        <div className="py-5">
-          <p className="text-sm font-semibold text-teal-700">Paso 5 de 7 · Evidencia ANTES</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">Registra el estado antes</h1>
+        <div className="py-4">
+          <h1 className="text-2xl font-bold text-slate-900">Registra el estado antes</h1>
           <p className="mt-2 text-sm text-slate-500">
             Coloca el vial sobre una balanza convencional. La foto debe mostrar el vial, su DataMatrix y el
             display de la báscula.

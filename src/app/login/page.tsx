@@ -95,17 +95,13 @@ export default function Login() {
   }
 
   if (mode === 'register' || mode === 'authenticate') {
+    // Sin Header aquí a propósito: el componente de cámara de AWS necesita
+    // todo el alto disponible, y con el header fijo arriba parte de su
+    // contenido quedaba tapado o forzaba scroll. Amplify ya trae su propio
+    // botón de cancelar.
     return (
       <div className="min-h-screen bg-slate-50">
-        <Header stepIndex={1} stepLabel="Profesional" />
-        <main className="mx-auto max-w-xl px-4 pb-8">
-          <div className="py-5">
-            <p className="text-sm font-semibold text-teal-700">Paso 1 de 7 · Profesional</p>
-            <h1 className="mt-1 text-2xl font-bold text-slate-900">
-              {mode === 'register' ? 'Registrar biométrico' : 'Verificando identidad'}
-            </h1>
-            <p className="mt-2 text-sm text-slate-500">Mira a la cámara y sigue las instrucciones en pantalla.</p>
-          </div>
+        <main className="mx-auto max-w-xl px-4 py-4">
           <LivenessCheck
             onComplete={mode === 'register' ? onRegisterComplete : onAuthenticateComplete}
             onCancel={() => setMode('idle')}

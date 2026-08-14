@@ -39,9 +39,8 @@ export default function NFC() {
     <div className="min-h-screen bg-slate-50">
       <Header stepIndex={4} stepLabel="Empaque" />
       <main className="mx-auto max-w-xl px-4 pb-8">
-        <div className="py-5">
-          <p className="text-sm font-semibold text-teal-700">Paso 4 de 7 · Empaque</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">Validar empaque</h1>
+        <div className="py-4">
+          <h1 className="text-2xl font-bold text-slate-900">Validar empaque</h1>
           <p className="mt-2 text-sm text-slate-500">
             El teléfono lee el identificador NFC. La validación contra producto, lote y estado se hará en backend.
           </p>

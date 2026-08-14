@@ -206,18 +206,25 @@ export default function Registro() {
     r.push('/');
   }
 
+  // Durante la captura en vivo (foto-viva + livenessStarted) escondemos el
+  // Header y la intro: el componente de cámara de AWS necesita todo el alto
+  // disponible, y con el header fijo arriba parte de su contenido quedaba
+  // tapado o forzaba scroll. Amplify ya trae su propio botón de cancelar.
+  const capturandoEnVivo = step === 'foto-viva' && livenessStarted;
+
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header stepIndex={2} stepLabel="Registro" />
-      <main className="mx-auto max-w-xl px-4 pb-8">
-        <div className="py-5">
-          <p className="text-sm font-semibold text-teal-700">Paso 2 de 7 · Registro</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">Escanear cédula</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Funciona con la cédula amarilla (laminada) y la cédula digital azul. Primero el frente, luego el
-            reverso.
-          </p>
-        </div>
+      {!capturandoEnVivo && <Header stepIndex={2} stepLabel="Registro" />}
+      <main className="mx-auto max-w-xl px-4 py-4">
+        {!capturandoEnVivo && (
+          <div className="py-4">
+            <h1 className="text-2xl font-bold text-slate-900">Escanear cédula</h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Funciona con la cédula amarilla (laminada) y la cédula digital azul. Primero el frente, luego el
+              reverso.
+            </p>
+          </div>
+        )}
 
         {step === 'frente' && (
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">

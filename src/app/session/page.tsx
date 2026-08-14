@@ -142,9 +142,8 @@ export default function Session() {
       <main className="mx-auto max-w-xl px-4 pb-8">
         {mode === 'confirm' && (
           <>
-            <div className="py-5">
-              <p className="text-sm font-semibold text-teal-700">Paso 2 de 7 · Paciente</p>
-              <h1 className="mt-1 text-2xl font-bold text-slate-900">Confirma el paciente</h1>
+            <div className="py-4">
+              <h1 className="text-2xl font-bold text-slate-900">Confirma el paciente</h1>
               <p className="mt-2 text-sm text-slate-500">
                 Verifica que la persona frente a ti corresponda al registro — esto evita administrar la dosis a la
                 persona equivocada.
@@ -178,9 +177,8 @@ export default function Session() {
 
         {(mode === 'search' || mode === 'notfound') && (
           <>
-            <div className="py-5">
-              <p className="text-sm font-semibold text-teal-700">Paso 2 de 7 · Paciente</p>
-              <h1 className="mt-1 text-2xl font-bold text-slate-900">Identificar paciente</h1>
+            <div className="py-4">
+              <h1 className="text-2xl font-bold text-slate-900">Identificar paciente</h1>
               <p className="mt-2 text-sm text-slate-500">
                 Busca por número de documento (debe estar registrado previamente por cédula).
               </p>

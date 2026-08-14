@@ -96,17 +96,13 @@ export default function VerificarPaciente() {
   }
 
   if (started) {
+    // Sin Header aquí a propósito: el componente de cámara de AWS necesita
+    // todo el alto disponible, y con el header fijo arriba parte de su
+    // contenido (el aviso de fotosensibilidad, el óvalo) quedaba tapado o
+    // forzaba scroll. Amplify ya trae su propio botón de cancelar.
     return (
       <div className="min-h-screen bg-slate-50">
-        <Header stepIndex={2} stepSuffix="b" stepLabel="Verificación" />
-        <main className="mx-auto max-w-xl px-4 pb-8">
-          <div className="py-5">
-            <p className="text-sm font-semibold text-teal-700">Paso 2b de 7 · Verificación</p>
-            <h1 className="mt-1 text-2xl font-bold text-slate-900">Verificando identidad</h1>
-            <p className="mt-2 text-sm text-slate-500">
-              Mantén el rostro dentro del marco y sigue las instrucciones en pantalla.
-            </p>
-          </div>
+        <main className="mx-auto max-w-xl px-4 py-4">
           <LivenessCheck onComplete={onComplete} onCancel={() => setStarted(false)} />
         </main>
       </div>
@@ -117,9 +113,8 @@ export default function VerificarPaciente() {
     <div className="min-h-screen bg-slate-50">
       <Header stepIndex={2} stepSuffix="b" stepLabel="Verificación" />
       <main className="mx-auto max-w-xl px-4 pb-8">
-        <div className="py-5">
-          <p className="text-sm font-semibold text-teal-700">Paso 2b de 7 · Verificación</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">Confirmar identidad del paciente</h1>
+        <div className="py-4">
+          <h1 className="text-2xl font-bold text-slate-900">Confirmar identidad del paciente</h1>
         </div>
 
         {!done && (

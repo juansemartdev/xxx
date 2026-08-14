@@ -101,9 +101,8 @@ export default function After() {
     <div className="min-h-screen bg-slate-50">
       <Header stepIndex={6} stepLabel="Evidencia después" />
       <main className="mx-auto max-w-xl px-4 pb-8">
-        <div className="py-5">
-          <p className="text-sm font-semibold text-teal-700">Paso 6 de 7 · Evidencia DESPUÉS</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">Registrar vial después</h1>
+        <div className="py-4">
+          <h1 className="text-2xl font-bold text-slate-900">Registrar vial después</h1>
           <p className="mt-2 text-sm text-slate-500">Vuelve a colocar el vial en la balanza y captura una imagen equivalente.</p>
         </div>
 
