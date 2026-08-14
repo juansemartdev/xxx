@@ -93,6 +93,12 @@ export default function Complete() {
           `El producto escaneado del vial (${scannedProduct}) no coincide con el prescrito en la atención (${session.atencionProduct}).`
         );
       }
+      const scannedExpiry = session.beforeExpiry || session.afterExpiry;
+      if (session.atencionExpiry && scannedExpiry && session.atencionExpiry !== scannedExpiry) {
+        reasons.push(
+          `El vencimiento escaneado del vial (${scannedExpiry}) no coincide con el prescrito en la atención (${session.atencionExpiry}).`
+        );
+      }
     }
 
     setAuditReasons(reasons);
