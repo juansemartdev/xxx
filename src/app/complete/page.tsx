@@ -2,7 +2,7 @@
 import {useEffect, useState} from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import {getSession, startNewEncounter, updateSession, Session} from '@/lib/session';
+import {getSession, startNewEncounter, startNextMedication, updateSession, Session} from '@/lib/session';
 import {appendHistory, deviationFromHistory} from '@/lib/history';
 import {useRequireProfessional} from '@/lib/useRequireProfessional';
 
@@ -110,18 +110,40 @@ export default function Complete() {
       updateSession({historyRecorded: true});
     }
 
-    // Marca la atención elegida como completada en el servidor, para que
-    // deje de aparecer en la lista de pendientes del paciente. Una sola
-    // vez por sesión (atencionCompleted evita reintentar en cada render).
-    if (session.atencionId && !session.atencionCompleted) {
+    // Marca el medicamento elegido como completado en el servidor y le
+    // adjunta toda la evidencia (fotos antes/después, peso, lo escaneado
+    // del vial, condición del vial) para que quede como registro auditable
+    // y deje de aparecer en la lista de pendientes del paciente. Antes esa
+    // evidencia solo vivía en el localStorage del celular y se perdía; con
+    // esto queda en el servidor. Una sola vez por sesión (atencionCompleted
+    // evita reintentar en cada render).
+    if (session.atencionMedicationId && !session.atencionCompleted) {
       updateSession({atencionCompleted: true});
-      fetch(`/api/atenciones/${session.atencionId}`, {
+      fetch(`/api/atenciones/medications/${session.atencionMedicationId}`, {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({status: 'completada'}),
+        body: JSON.stringify({
+          status: 'completada',
+          beforePhoto: session.beforePhoto,
+          beforeProduct: session.beforeProduct,
+          beforeGtin: session.beforeGtin,
+          beforeLot: session.beforeLot,
+          beforeExpiry: session.beforeExpiry,
+          beforeWeight: session.beforeWeight,
+          afterPhoto: session.afterPhoto,
+          afterProduct: session.afterProduct,
+          afterGtin: session.afterGtin,
+          afterLot: session.afterLot,
+          afterExpiry: session.afterExpiry,
+          afterWeight: session.afterWeight,
+          vialLooksOpened: session.vialLooksOpened,
+          vialConditionConfidence: session.vialConditionConfidence,
+          vialConditionNotes: session.vialConditionNotes,
+        }),
       }).catch(() => {
-        // No bloqueamos el cierre de sesión por esto; si falla, la atención
-        // queda pendiente y el profesional puede volver a elegirla luego.
+        // No bloqueamos el cierre de sesión por esto; si falla, el
+        // medicamento queda pendiente y el profesional puede volver a
+        // elegirlo luego.
       });
     }
   }, []);
@@ -232,12 +254,27 @@ export default function Complete() {
           )}
         </div>
 
+        {s.patientDocNumber && (
+          <button
+            className="btn primary"
+            onClick={() => {
+              // Mantiene al paciente ya identificado/verificado (y al
+              // profesional) — para el siguiente medicamento pendiente de
+              // este mismo paciente no hace falta repetir la verificación
+              // biométrica.
+              startNextMedication();
+              location.href = '/atenciones';
+            }}
+          >
+            Siguiente medicamento de este paciente
+          </button>
+        )}
         <button
-          className="btn primary"
+          className="btn secondary"
           onClick={() => {
-            // Mantiene al profesional logueado — solo limpia el paciente y
-            // los datos de esta dosis, para poder seguir atendiendo sin
-            // volver a pasar por Face Liveness.
+            // Mantiene al profesional logueado — limpia el paciente y los
+            // datos de esta dosis, para atender a alguien distinto sin
+            // volver a pasar por Face Liveness del profesional.
             startNewEncounter();
             location.href = '/session';
           }}

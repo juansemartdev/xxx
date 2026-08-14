@@ -104,23 +104,30 @@ export async function ensurePatientsSchema() {
 
 let atencionesSchemaReady = false;
 
-// "Atenciones": medicamentos pendientes por aplicar a un paciente (producto,
-// lote, vencimiento). Las crea un sistema externo llamando a
-// POST /api/atenciones (protegido con ATENCIONES_API_KEY) — ChainDose no
-// las prescribe, solo las consume: el profesional las ve en /atenciones
-// después de identificar al paciente, elige una, y al cerrar la sesión de
-// dosis (ver /complete) queda marcada como "completada".
+// "Atenciones": encargos de un sistema externo con uno o más medicamentos
+// pendientes por aplicar a un paciente. Una atención = una "orden" (por
+// ejemplo, todo lo que hay que aplicarle a un paciente en una visita); cada
+// medicamento dentro de ella vive en atencion_medicamentos, con su propio
+// lote/vencimiento y su propio ciclo antes/después — incluida la foto de
+// evidencia, que aquí SÍ queda guardada en el servidor (antes solo vivía
+// en el localStorage del celular del profesional y se perdía si se
+// borraba el navegador o se cambiaba de dispositivo).
+//
+// ChainDose no las prescribe, solo las consume: las crea un sistema
+// externo vía POST /api/atenciones (protegido con ATENCIONES_API_KEY), el
+// profesional las ve en /atenciones después de identificar al paciente, y
+// cada medicamento queda "completado" al cerrar su propia sesión de dosis
+// (ver /complete). Cuando todos los medicamentos de una atención quedan
+// completados, la atención misma pasa a "completada" automáticamente (si
+// solo algunos, queda "parcial").
 export async function ensureAtencionesSchema() {
   if (atencionesSchemaReady) return;
   const sql = getSql();
+
   await sql`
     CREATE TABLE IF NOT EXISTS atenciones (
       id SERIAL PRIMARY KEY,
       document_number TEXT NOT NULL,
-      product TEXT NOT NULL,
-      gtin TEXT,
-      lot TEXT,
-      expiry TEXT,
       notes TEXT,
       external_reference TEXT,
       status TEXT NOT NULL DEFAULT 'pendiente',
@@ -131,5 +138,70 @@ export async function ensureAtencionesSchema() {
   `;
   await sql`CREATE INDEX IF NOT EXISTS idx_atenciones_document ON atenciones (document_number)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_atenciones_status ON atenciones (status)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS atencion_medicamentos (
+      id SERIAL PRIMARY KEY,
+      atencion_id INTEGER NOT NULL REFERENCES atenciones (id) ON DELETE CASCADE,
+      product TEXT NOT NULL,
+      gtin TEXT,
+      lot TEXT,
+      expiry TEXT,
+      notes TEXT,
+      status TEXT NOT NULL DEFAULT 'pendiente',
+
+      -- Evidencia ANTES: lo escaneado/leído del vial físico (puede diferir
+      -- de product/gtin/lot/expiry arriba, que es lo PRESCRITO) + la foto.
+      before_photo TEXT,
+      before_product TEXT,
+      before_gtin TEXT,
+      before_lot TEXT,
+      before_expiry TEXT,
+      before_weight DOUBLE PRECISION,
+
+      -- Evidencia DESPUÉS, igual que arriba.
+      after_photo TEXT,
+      after_product TEXT,
+      after_gtin TEXT,
+      after_lot TEXT,
+      after_expiry TEXT,
+      after_weight DOUBLE PRECISION,
+
+      -- Evaluación por IA de si el vial en la foto DESPUÉS se ve
+      -- físicamente abierto/alterado.
+      vial_looks_opened BOOLEAN,
+      vial_condition_confidence TEXT,
+      vial_condition_notes TEXT,
+
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      completed_at TIMESTAMPTZ
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_atencion_medicamentos_atencion ON atencion_medicamentos (atencion_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_atencion_medicamentos_status ON atencion_medicamentos (status)`;
+
+  // Migración desde el esquema anterior (una fila de "atenciones" = un
+  // medicamento, sin tabla de detalle): si la columna "product" todavía
+  // existe en atenciones, migramos cada fila a atencion_medicamentos y
+  // luego la eliminamos. Corre una sola vez; después de la migración esta
+  // columna ya no existe y este bloque no vuelve a hacer nada.
+  const legacyColumn = await sql`
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'atenciones' AND column_name = 'product'
+  `;
+  if (legacyColumn.length > 0) {
+    await sql`
+      INSERT INTO atencion_medicamentos (atencion_id, product, gtin, lot, expiry, status, created_at, updated_at, completed_at)
+      SELECT id, product, gtin, lot, expiry, status, created_at, updated_at, completed_at
+      FROM atenciones
+      WHERE product IS NOT NULL
+    `;
+    await sql`ALTER TABLE atenciones DROP COLUMN IF EXISTS product`;
+    await sql`ALTER TABLE atenciones DROP COLUMN IF EXISTS gtin`;
+    await sql`ALTER TABLE atenciones DROP COLUMN IF EXISTS lot`;
+    await sql`ALTER TABLE atenciones DROP COLUMN IF EXISTS expiry`;
+  }
+
   atencionesSchemaReady = true;
 }
