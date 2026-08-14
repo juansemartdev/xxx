@@ -70,3 +70,34 @@ export async function ensureLivenessSchema() {
   `;
   livenessSchemaReady = true;
 }
+
+let patientsSchemaReady = false;
+
+// Pacientes registrados por cédula (ver /registro). Antes solo vivían en el
+// localStorage del navegador del profesional; ahora quedan en el servidor
+// para poder buscarlos por número de documento desde cualquier dispositivo
+// y reusarlos en sesiones futuras sin volver a escanear la cédula.
+// document_number es UNIQUE: cada registro nuevo actualiza (upsert) al
+// paciente existente en vez de duplicarlo.
+export async function ensurePatientsSchema() {
+  if (patientsSchemaReady) return;
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS patients (
+      id SERIAL PRIMARY KEY,
+      document_number TEXT NOT NULL UNIQUE,
+      first_name TEXT,
+      middle_name TEXT,
+      last_name TEXT,
+      second_last_name TEXT,
+      birth_date TEXT,
+      blood_type TEXT,
+      gender TEXT,
+      id_photo TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_patients_document ON patients (document_number)`;
+  patientsSchemaReady = true;
+}

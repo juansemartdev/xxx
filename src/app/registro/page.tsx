@@ -18,6 +18,8 @@ export default function Registro() {
   const [processing, setProcessing] = useState(false);
   const [sourceMsg, setSourceMsg] = useState('');
   const [rawBarcode, setRawBarcode] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
@@ -92,7 +94,7 @@ export default function Registro() {
     }
   }
 
-  function guardar() {
+  async function guardar() {
     const fullName = [firstName, middleName, lastName, secondLastName].filter(Boolean).join(' ');
     updateSession({
       patient: fullName || undefined,
@@ -113,6 +115,45 @@ export default function Registro() {
       patientFaceMatchSimilarity: undefined,
       patientVerificationNotes: undefined,
     });
+
+    // Guarda el paciente también en el servidor (Supabase), no solo en este
+    // navegador — así se puede buscar por cédula desde /session en otra
+    // sesión o dispositivo, en vez de depender de que siga en este mismo
+    // localStorage.
+    setSaving(true);
+    setSaveError('');
+    try {
+      const res = await fetch('/api/patients', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          documentNumber,
+          firstName,
+          middleName,
+          lastName,
+          secondLastName,
+          birthDate,
+          bloodType,
+          gender,
+          idPhotoBase64: frontPhoto,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'No se pudo guardar el paciente en el servidor.');
+    } catch (e) {
+      // No perdemos los datos: ya quedaron en este dispositivo (localStorage)
+      // y se puede seguir usando la sesión con normalidad. Nos quedamos en
+      // esta pantalla para avisar, en vez de navegar y que el aviso se
+      // pierda, y dejamos que el usuario decida reintentar o continuar.
+      setSaveError(
+        e instanceof Error
+          ? `El paciente se guardó en este dispositivo, pero no se pudo respaldar en el servidor: ${e.message}`
+          : 'El paciente se guardó en este dispositivo, pero no se pudo respaldar en el servidor.'
+      );
+      setSaving(false);
+      return;
+    }
+    setSaving(false);
     r.push('/');
   }
 
@@ -210,13 +251,22 @@ export default function Registro() {
               />
             </div>
 
+            {saveError && (
+              <p className="text-sm text-red-700 bg-red-50 rounded-md p-2">{saveError}</p>
+            )}
+
             <button
-              disabled={!firstName || !lastName}
+              disabled={!firstName || !lastName || saving}
               className="btn primary disabled:opacity-40"
               onClick={guardar}
             >
-              Guardar registro
+              {saving ? 'Guardando…' : 'Guardar registro'}
             </button>
+            {saveError && (
+              <button className="btn secondary" onClick={() => r.push('/')}>
+                Continuar de todas formas (ya quedó guardado en este dispositivo)
+              </button>
+            )}
           </>
         )}
       </div>
